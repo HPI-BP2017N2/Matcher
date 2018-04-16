@@ -15,4 +15,16 @@ public class MatchingResult {
     private String offerKey;
     private ParsedOffer parsedData;
 
+    public MatchingResult(long shopId,
+                          String matchingReason,
+                          int confidence,
+                          String offerKey,
+                          ParsedOffer parsedData) {
+        setShopId(shopId);
+        setMatchingReason(matchingReason);
+        setConfidence(confidence);
+        setOfferKey(offerKey);
+        setParsedData(parsedData);
+    }
+
 }

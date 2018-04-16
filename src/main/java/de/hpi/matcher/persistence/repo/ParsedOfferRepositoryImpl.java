@@ -25,7 +25,7 @@ public class ParsedOfferRepositoryImpl implements ParsedOfferRepository {
     }
 
     @Override
-    public ParsedOffer getbyEan(long shopId, String ean) {
+    public ParsedOffer getByEan(long shopId, String ean) {
         return getByIdentifier(shopId, "ean", ean);
     }
 
@@ -44,8 +44,8 @@ public class ParsedOfferRepositoryImpl implements ParsedOfferRepository {
         getMongoTemplate().remove(query(where("url").is(url)), Long.toString(shopId));
     }
 
-    // actions
-    private ParsedOffer getByIdentifier(long shopId, String identifier, String value) {
+    @Override
+    public ParsedOffer getByIdentifier(long shopId, String identifier, String value) {
         return getMongoTemplate().findOne(query(where(identifier).is(value)), ParsedOffer.class, Long.toString(shopId));
     }
 }
