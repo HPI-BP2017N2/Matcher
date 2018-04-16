@@ -5,7 +5,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Slf4j
@@ -14,5 +14,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class MatcherController {
 
     private final MatcherService matcherService;
+
+    @RequestMapping(value = "/doSth/{shopID}", method = RequestMethod.GET, produces = "application/json")
+    public void doSth(@PathVariable long shopID){
+        getMatcherService().matchShop(shopID, (byte)0);
+
+    }
 
 }

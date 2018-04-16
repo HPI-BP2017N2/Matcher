@@ -21,7 +21,7 @@ public class RabbitReceiver {
     public void onMessage(FinishedShop request) {
         log.debug("Got an {}", request);
         try {
-            getMatcherService().matchShop(request.getShopId());
+            getMatcherService().matchShop(request.getShopId(), (byte)0);
         } catch (Exception e) {
             log.warn("Exception in amqp listener method", e);
         }
