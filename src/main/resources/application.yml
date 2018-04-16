@@ -33,3 +33,9 @@ state:
   password: ${MONGO_MATCHER_PW}
   database: matchingState
 
+cache:
+ uri: ${CACHE_IP}
+ getOfferRoute: "/getOffer/"
+ deleteOfferRoute: "/deleteOffer/"
+ deleteAllRoute: "/deleteAll/"
+ warmupRoute: "/warmup/"
