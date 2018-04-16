@@ -1,6 +1,6 @@
 package de.hpi.matcher.persistence.repo;
 
-import de.hpi.matcher.persistence.State;
+import de.hpi.matcher.persistence.ParsedOffer;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,24 +13,14 @@ import static org.springframework.data.mongodb.core.query.Query.query;
 
 @Getter(AccessLevel.PRIVATE)
 @Repository
-public class MatcherStateRepositoryImpl  implements MatcherStateRepository{
+public class ParsedOfferRepositoryImpl implements ParsedOfferRepository {
 
     @Autowired
-    @Qualifier(value = "stateTemplate")
+    @Qualifier("parsedOfferTemplate")
     private MongoTemplate mongoTemplate;
 
-
     @Override
-    public void saveState(long shopId, byte phase) {
-        getMongoTemplate().insert(new State(shopId, phase));
-
+    public ParsedOffer getParsedOffer(long shopId) {
+        return getMongoTemplate().findOne(query(where("url").exists(true)), ParsedOffer.class);
     }
-
-    @Override
-    public State popState() {
-        State state = getMongoTemplate().findOne(query(where("shopId").exists(true)), State.class);
-        getMongoTemplate().remove(state);
-        return state;
-    }
-
 }
