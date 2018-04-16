@@ -1,0 +1,41 @@
+server:
+  port: ${MATCHER_PORT}
+
+spring:
+ rabbitmq:
+  host: ${RABBIT_IP}
+  port: ${RABBIT_PORT}
+  username: ${RABBIT_USER}
+  password: ${RABBIT_PW}
+  queueName: ${RABBIT_QUEUE_NAME}
+
+parsed-offers:
+ mongodb:
+  host: ${MONGO_IP}
+  port: ${MONGO_PORT}
+  username: ${MONGO_MATCHER_USER}
+  password: ${MONGO_MATCHER_PW}
+  database: parsedOffers
+
+matching-results:
+ mongodb:
+  host: ${MONGO_IP}
+  port: ${MONGO_PORT}
+  username: ${MONGO_MATCHER_USER}
+  password: ${MONGO_MATCHER_PW}
+  database: matchingResults
+
+state:
+ mongodb:
+  host: ${MONGO_IP}
+  port: ${MONGO_PORT}
+  username: ${MONGO_MATCHER_USER}
+  password: ${MONGO_MATCHER_PW}
+  database: matchingState
+
+cache:
+ uri: ${CACHE_IP}
+ getOfferRoute: "/getOffer/"
+ deleteOfferRoute: "/deleteOffer/"
+ deleteAllRoute: "/deleteAll/"
+ warmupRoute: "/warmup/"
