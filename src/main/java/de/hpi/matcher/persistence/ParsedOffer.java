@@ -4,14 +4,16 @@ package de.hpi.matcher.persistence;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.Id;
 
 @Getter
 @Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ParsedOffer {
 
-    private long crawlingTimestamp;
+    @Id
     private String url;
+    private long crawlingTimestamp;
     private String ean;
     private String sku;
     private String han;
