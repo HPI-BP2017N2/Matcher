@@ -7,7 +7,11 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.retry.backoff.ExponentialRandomBackOffPolicy;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -32,6 +36,12 @@ public class Cache {
         getRestTemplate().getForObject(warmupURI(shopId), Object.class);
     }
 
+
+    @Retryable(
+            value = {HttpClientErrorException.class },
+            maxAttempts = 5,
+            backoff = @Backoff(delay = 5000, multiplier = 5)
+    )
     public ShopOffer getOffer(long shopId, byte phase) {
         return getRestTemplate().getForObject(getOffersURI(shopId, phase), ShopOffer.class);
     }

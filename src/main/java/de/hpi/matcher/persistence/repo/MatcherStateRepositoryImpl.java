@@ -29,7 +29,9 @@ public class MatcherStateRepositoryImpl  implements MatcherStateRepository{
     @Override
     public State popState() {
         State state = getMongoTemplate().findOne(query(where("shopId").exists(true)), State.class);
-        getMongoTemplate().remove(state);
+        if(state != null) {
+            getMongoTemplate().remove(state);
+        }
         return state;
     }
 

@@ -50,12 +50,10 @@ public class MatcherService {
     @PostConstruct
     public void restartInterruptedMatching() {
         State state = getMatcherStateRepository().popState();
-        if(state == null) {
-            return;
-        }
-
-        setPhase(state.getPhase());
+        if(state != null) {
+            setPhase(state.getPhase());
         matchShop(state.getShopId(), state.getPhase());
+        }
     }
 
     @PreDestroy
@@ -75,9 +73,10 @@ public class MatcherService {
             offer = getCache().getOffer(shopId, (byte)0);
             ParsedOffer match = null;
             for(IMatchIdentifierStrategy strategy : getIdentifierStrategies()) {
-                match = strategy.match(shopId, offer);
+                match = (offer != null)? strategy.match(shopId, offer) : null;
                 if(match != null) {
-                    saveResultAndDeleteShopOffer(shopId, offer, match, strategy.matchingReason());
+                    saveResult(offer, match, strategy.matchingReason());
+                    deleteShopOfferAndParsedOffer(shopId, offer, match);
                     break;
                 }
 
@@ -87,18 +86,23 @@ public class MatcherService {
 
     }
 
-    private void saveResultAndDeleteShopOffer(long shopId,
-                                              ShopOffer offer,
-                                              ParsedOffer match,
-                                              String matchingReason) {
+    private void saveResult(ShopOffer offer,
+                            ParsedOffer match,
+                            String matchingReason) {
         MatchingResult result = new MatchingResult(
-                shopId,
+                offer.getShopId(),
                 matchingReason,
                 100,
                 offer.getOfferKey(),
                 match);
 
-        getMatchingResultRepository().save(shopId, result);
-        getCache().deleteOffer(shopId, offer.getOfferKey());
+        getMatchingResultRepository().save(offer.getShopId(), result);
+
+    }
+
+    private void deleteShopOfferAndParsedOffer(long shopId, ShopOffer shopOffer, ParsedOffer parsedOffer) {
+        getCache().deleteOffer(shopId, shopOffer.getOfferKey());
+        getParsedOfferRepository().deleteParsedOffer(shopId, parsedOffer.getUrl());
+
     }
 }

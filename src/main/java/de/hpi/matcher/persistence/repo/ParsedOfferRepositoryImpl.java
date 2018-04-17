@@ -21,7 +21,7 @@ public class ParsedOfferRepositoryImpl implements ParsedOfferRepository {
 
     @Override
     public ParsedOffer getParsedOffer(long shopId) {
-        return getMongoTemplate().findOne(query(where("url").exists(true)), ParsedOffer.class, Long.toString(shopId));
+        return getMongoTemplate().findOne(query(where("_id").exists(true)), ParsedOffer.class, Long.toString(shopId));
     }
 
     @Override
@@ -41,11 +41,12 @@ public class ParsedOfferRepositoryImpl implements ParsedOfferRepository {
 
     @Override
     public void deleteParsedOffer(long shopId, String url) {
-        getMongoTemplate().remove(query(where("url").is(url)), Long.toString(shopId));
+        getMongoTemplate().remove(query(where("_id").is(url)), Long.toString(shopId));
     }
 
-    @Override
-    public ParsedOffer getByIdentifier(long shopId, String identifier, String value) {
-        return getMongoTemplate().findOne(query(where(identifier).is(value)), ParsedOffer.class, Long.toString(shopId));
+    private ParsedOffer getByIdentifier(long shopId, String identifier, String value) {
+        return (value != null)?
+                getMongoTemplate().findOne(query(where(identifier).is(value)), ParsedOffer.class, Long.toString(shopId))
+                : null;
     }
 }

@@ -18,7 +18,7 @@ public class ParsedOffer {
     private String sku;
     private String han;
     private String title;
-    private double price;
+    private String price;
     private String description;
     private String brandName;
     private String category;
