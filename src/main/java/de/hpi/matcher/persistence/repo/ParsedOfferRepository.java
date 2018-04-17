@@ -10,5 +10,4 @@ public interface ParsedOfferRepository {
     ParsedOffer getBySku(long shopId, String sku);
     void deleteParsedOffer(long shopId, String url);
 
-    ParsedOffer getByIdentifier(long shopId, String identifier, String value);
 }
