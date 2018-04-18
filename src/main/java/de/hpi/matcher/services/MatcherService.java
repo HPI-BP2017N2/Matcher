@@ -24,7 +24,7 @@ import java.util.List;
 public class MatcherService {
 
     private byte phase = 0;
-    private long shopId;
+    private long shopId = 0;
     private Cache cache;
     private MatcherStateRepository matcherStateRepository;
     private ParsedOfferRepository parsedOfferRepository;
@@ -51,39 +51,52 @@ public class MatcherService {
     public void restartInterruptedMatching() {
         State state = getMatcherStateRepository().popState();
         if(state != null) {
-            setPhase(state.getPhase());
-        matchShop(state.getShopId(), state.getPhase());
+            matchShop(state.getShopId(), state.getPhase());
         }
     }
 
     @PreDestroy
     public void saveState() {
-        getMatcherStateRepository().saveState(getShopId(), getPhase());
-
+        if(getShopId() != 0) {
+            getMatcherStateRepository().saveState(getShopId(), getPhase());
+        }
     }
 
     public void matchShop(long shopId, byte phase) {
-        matchByIdentifiers(shopId);
+        setupState(shopId, phase);
+        getCache().warmup(shopId);
+        matchAllByIdentifier(shopId);
+        clearState();
+    }
+
+    private void clearState() {
+        setShopId(0);
+        setPhase((byte)0);
+    }
+
+    private void setupState(long shopId, byte phase) {
+        setShopId(shopId);
+        setPhase(phase);
+    }
+
+    private void matchAllByIdentifier(long shopId) {
+        ShopOffer offer;
+        do {
+            offer = getCache().getOffer(shopId, (byte)0);
+            matchSingleByIdentifier(shopId, offer);
+        } while (offer != null);
 
     }
 
-    private void matchByIdentifiers(long shopId) {
-        ShopOffer offer = null;
-        do {
-            offer = getCache().getOffer(shopId, (byte)0);
-            ParsedOffer match = null;
-            for(IMatchIdentifierStrategy strategy : getIdentifierStrategies()) {
-                match = (offer != null)? strategy.match(shopId, offer) : null;
-                if(match != null) {
-                    saveResult(offer, match, strategy.matchingReason());
-                    deleteShopOfferAndParsedOffer(shopId, offer, match);
-                    break;
-                }
-
+    private void matchSingleByIdentifier(long shopId, ShopOffer offer) {
+        for(IMatchIdentifierStrategy strategy : getIdentifierStrategies()) {
+            ParsedOffer match = (offer != null)? strategy.match(shopId, offer) : null;
+            if(match != null) {
+                saveResult(offer, match, strategy.getMatchingReason());
+                deleteShopOfferAndParsedOffer(shopId, offer, match);
+                return;
             }
-
-        } while (offer != null);
-
+        }
     }
 
     private void saveResult(ShopOffer offer,

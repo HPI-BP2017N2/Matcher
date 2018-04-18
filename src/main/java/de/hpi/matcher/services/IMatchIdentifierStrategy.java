@@ -6,5 +6,5 @@ import de.hpi.matcher.persistence.ParsedOffer;
 public interface IMatchIdentifierStrategy {
 
     ParsedOffer match(long shopId, ShopOffer offer);
-    String matchingReason();
+    String getMatchingReason();
 }
