@@ -5,17 +5,15 @@ import de.hpi.matcher.persistence.ParsedOffer;
 import de.hpi.matcher.persistence.repo.ParsedOfferRepository;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 @Getter(AccessLevel.PRIVATE)
 @Setter(AccessLevel.PRIVATE)
-public class MatchHanStrategy implements IMatchIdentifierStrategy {
+@RequiredArgsConstructor
+public class MatchHanStrategy implements MatchIdentifierStrategy {
 
-    private ParsedOfferRepository repository;
-
-    public MatchHanStrategy(ParsedOfferRepository repository) {
-        setRepository(repository);
-    }
+    private final ParsedOfferRepository repository;
 
     @Override
     public ParsedOffer match(long shopId, ShopOffer offer) {
@@ -23,7 +21,7 @@ public class MatchHanStrategy implements IMatchIdentifierStrategy {
     }
 
     @Override
-    public String matchingReason() {
+    public String getMatchingReason() {
         return "han";
     }
 }

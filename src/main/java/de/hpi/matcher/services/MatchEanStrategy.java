@@ -5,17 +5,15 @@ import de.hpi.matcher.persistence.ParsedOffer;
 import de.hpi.matcher.persistence.repo.ParsedOfferRepository;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 @Getter(AccessLevel.PRIVATE)
 @Setter(AccessLevel.PRIVATE)
-public class MatchEanStrategy implements IMatchIdentifierStrategy {
+@RequiredArgsConstructor
+public class MatchEanStrategy implements MatchIdentifierStrategy {
 
-    private ParsedOfferRepository repository;
-
-    public MatchEanStrategy(ParsedOfferRepository repository) {
-        setRepository(repository);
-    }
+    private final ParsedOfferRepository repository;
 
     @Override
     public ParsedOffer match(long shopId, ShopOffer offer) {
@@ -23,7 +21,7 @@ public class MatchEanStrategy implements IMatchIdentifierStrategy {
     }
 
     @Override
-    public String matchingReason() {
+    public String getMatchingReason() {
         return "ean";
     }
 }
