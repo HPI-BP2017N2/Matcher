@@ -29,7 +29,7 @@ public class MatcherService {
     private MatcherStateRepository matcherStateRepository;
     private ParsedOfferRepository parsedOfferRepository;
     private MatchingResultRepository matchingResultRepository;
-    private List<IMatchIdentifierStrategy> identifierStrategies = new ArrayList<>();
+    private List<MatchIdentifierStrategy> identifierStrategies = new ArrayList<>();
 
     @Autowired
     public MatcherService(MatcherStateRepository matcherStateRepository,
@@ -42,8 +42,6 @@ public class MatcherService {
         setCache(cache);
         getIdentifierStrategies().add(new MatchEanStrategy(getParsedOfferRepository()));
         getIdentifierStrategies().add(new MatchHanStrategy(getParsedOfferRepository()));
-        getIdentifierStrategies().add(new MatchSkuStrategy(getParsedOfferRepository()));
-
     }
 
 
@@ -89,7 +87,7 @@ public class MatcherService {
     }
 
     private void matchSingleByIdentifier(long shopId, ShopOffer offer) {
-        for(IMatchIdentifierStrategy strategy : getIdentifierStrategies()) {
+        for(MatchIdentifierStrategy strategy : getIdentifierStrategies()) {
             ParsedOffer match = (offer != null)? strategy.match(shopId, offer) : null;
             if(match != null) {
                 saveResult(offer, match, strategy.getMatchingReason());

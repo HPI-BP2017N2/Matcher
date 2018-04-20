@@ -11,7 +11,7 @@ import lombok.Setter;
 @Getter(AccessLevel.PRIVATE)
 @Setter(AccessLevel.PRIVATE)
 @RequiredArgsConstructor
-public class MatchHanStrategy implements IMatchIdentifierStrategy {
+public class MatchHanStrategy implements MatchIdentifierStrategy {
 
     private final ParsedOfferRepository repository;
 
