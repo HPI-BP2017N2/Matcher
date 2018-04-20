@@ -25,7 +25,6 @@ import static org.mockito.MockitoAnnotations.initMocks;
 @Setter(AccessLevel.PRIVATE)
 public class MatcherServiceTest {
 
-
     @Getter(AccessLevel.PRIVATE) private static final long EXAMPLE_SHOP_ID = 1234;
     @Getter(AccessLevel.PRIVATE) private static final String EXAMPLE_EAN = "1234567890123";
     @Getter(AccessLevel.PRIVATE) private static final String EXAMPLE_HAN = "123456";
