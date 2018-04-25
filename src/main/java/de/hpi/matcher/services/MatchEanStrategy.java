@@ -17,7 +17,16 @@ public class MatchEanStrategy implements MatchIdentifierStrategy {
 
     @Override
     public ParsedOffer match(long shopId, ShopOffer offer) {
-        return getRepository().getByEan(shopId, offer.getEan());
+        if(offer.getEan() == null) return null;
+        String normalizedEan = deleteLeadingZeros(offer.getEan());
+        ParsedOffer exactMatch = getRepository().getByEan(shopId, normalizedEan);
+        if(exactMatch != null) return exactMatch;
+
+        return getRepository().getByEanWithVariation(shopId, deleteLeadingZeros(offer.getEan()));
+    }
+
+    private String deleteLeadingZeros(String ean) {
+        return ean.replaceFirst("^0+", "");
     }
 
     @Override

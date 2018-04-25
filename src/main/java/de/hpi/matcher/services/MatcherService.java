@@ -62,7 +62,7 @@ public class MatcherService {
 
     public void matchShop(long shopId, byte phase) {
         setupState(shopId, phase);
-        getCache().warmup(shopId);
+        //getCache().warmup(shopId);
         matchAllByIdentifier(shopId);
         clearState();
     }
