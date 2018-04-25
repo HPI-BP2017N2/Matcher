@@ -25,23 +25,21 @@ public class MatcherService {
 
     private byte phase = 0;
     private long shopId = 0;
-    private Cache cache;
-    private MatcherStateRepository matcherStateRepository;
-    private ParsedOfferRepository parsedOfferRepository;
-    private MatchingResultRepository matchingResultRepository;
-    private List<MatchIdentifierStrategy> identifierStrategies = new ArrayList<>();
+    private final Cache cache;
+    private final MatcherStateRepository matcherStateRepository;
+    private final ParsedOfferRepository parsedOfferRepository;
+    private final MatchingResultRepository matchingResultRepository;
+    private final List<MatchIdentifierStrategy> identifierStrategies = new ArrayList<>();
 
     @Autowired
     public MatcherService(MatcherStateRepository matcherStateRepository,
                           ParsedOfferRepository parsedOfferRepository,
                           MatchingResultRepository matchingResultRepository,
                           Cache cache){
-        setMatcherStateRepository(matcherStateRepository);
-        setParsedOfferRepository(parsedOfferRepository);
-        setMatchingResultRepository(matchingResultRepository);
-        setCache(cache);
-        getIdentifierStrategies().add(new MatchEanStrategy(getParsedOfferRepository()));
-        getIdentifierStrategies().add(new MatchHanStrategy(getParsedOfferRepository()));
+        this.matcherStateRepository = matcherStateRepository;
+        this.parsedOfferRepository = parsedOfferRepository;
+        this.matchingResultRepository = matchingResultRepository;
+        this.cache = cache;
     }
 
 
@@ -62,9 +60,24 @@ public class MatcherService {
 
     public void matchShop(long shopId, byte phase) {
         setupState(shopId, phase);
-        //getCache().warmup(shopId);
-        matchAllByIdentifier(shopId);
+        getCache().warmup(shopId);
+        setStrategies(shopId);
+
+        if(!getIdentifierStrategies().isEmpty()){
+            matchAllByIdentifier(shopId);
+        }
+        setPhase((byte)(getPhase() + 1));
         clearState();
+    }
+
+    private void setStrategies(long shopId) {
+        if(getParsedOfferRepository().eanFound(shopId)) {
+            getIdentifierStrategies().add(new MatchEanStrategy(getParsedOfferRepository()));
+        }
+
+        if(getParsedOfferRepository().hanFound(shopId)) {
+            getIdentifierStrategies().add(new MatchHanStrategy(getParsedOfferRepository()));
+        }
     }
 
     private void clearState() {

@@ -4,6 +4,8 @@ import de.hpi.matcher.persistence.ParsedOffer;
 
 public interface ParsedOfferRepository {
 
+    boolean eanFound(long shopId);
+    boolean hanFound(long shopId);
     ParsedOffer getByEan(long shopId, String ean);
     ParsedOffer getByEanWithVariation(long shopId, String ean);
     ParsedOffer getByHan(long shopId, String han);

@@ -20,6 +20,16 @@ public class ParsedOfferRepositoryImpl implements ParsedOfferRepository {
     private MongoTemplate mongoTemplate;
 
     @Override
+    public boolean eanFound(long shopId) {
+        return getMongoTemplate().count(query(where("ean").regex(".+")), ParsedOffer.class, Long.toString(shopId)) > 0;
+    }
+
+    @Override
+    public boolean hanFound(long shopId) {
+        return getMongoTemplate().count(query(where("han").regex(".+")), ParsedOffer.class, Long.toString(shopId)) > 0;
+    }
+
+    @Override
     public ParsedOffer getByEan(long shopId, String ean) {
         return getByIdentifier(shopId, "ean", ean);
     }

@@ -21,14 +21,14 @@ import java.net.URI;
 @Repository
 public class Cache {
 
-    private RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
 
-    private CacheProperties properties;
+    private final CacheProperties properties;
 
     @Autowired
     public Cache(RestTemplateBuilder restTemplateBuilder, CacheProperties cacheProperties) {
-        setProperties(cacheProperties);
-        setRestTemplate(restTemplateBuilder.build());
+        this.properties = cacheProperties;
+        this.restTemplate = restTemplateBuilder.build();
     }
 
     public void warmup(long shopId) {
