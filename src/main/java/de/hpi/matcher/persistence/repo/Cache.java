@@ -1,4 +1,4 @@
-package de.hpi.matcher.services;
+package de.hpi.matcher.persistence.repo;
 
 import de.hpi.matcher.dto.ShopOffer;
 import de.hpi.matcher.properties.CacheProperties;

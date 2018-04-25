@@ -3,6 +3,7 @@ package de.hpi.matcher.services;
 import de.hpi.matcher.dto.ShopOffer;
 import de.hpi.matcher.persistence.MatchingResult;
 import de.hpi.matcher.persistence.ParsedOffer;
+import de.hpi.matcher.persistence.repo.Cache;
 import de.hpi.matcher.persistence.repo.MatchingResultRepositoryImpl;
 import de.hpi.matcher.persistence.repo.ParsedOfferRepositoryImpl;
 import lombok.AccessLevel;
@@ -12,10 +13,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 

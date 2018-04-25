@@ -4,6 +4,7 @@ import de.hpi.matcher.dto.ShopOffer;
 import de.hpi.matcher.persistence.MatchingResult;
 import de.hpi.matcher.persistence.ParsedOffer;
 import de.hpi.matcher.persistence.State;
+import de.hpi.matcher.persistence.repo.Cache;
 import de.hpi.matcher.persistence.repo.MatcherStateRepository;
 import de.hpi.matcher.persistence.repo.MatchingResultRepository;
 import de.hpi.matcher.persistence.repo.ParsedOfferRepository;
