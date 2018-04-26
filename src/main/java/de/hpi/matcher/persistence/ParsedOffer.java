@@ -7,13 +7,15 @@ import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 
+import java.util.Date;
+
 @Getter
 @Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ParsedOffer {
 
     @Id private String url;
-    private long crawlingTimestamp;
+    private Date crawlingTimestamp;
     @Indexed private String ean;
     @Indexed private String han;
     @Indexed private String imageUrl;
