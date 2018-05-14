@@ -30,7 +30,8 @@ public class MatcherService {
     private final MatcherStateRepository matcherStateRepository;
     private final ParsedOfferRepository parsedOfferRepository;
     private final MatchingResultRepository matchingResultRepository;
-    private final List<MatchIdentifierStrategy> identifierStrategies = new ArrayList<>();
+    private List<MatchIdentifierStrategy> identifierStrategies = new ArrayList<>();
+    private List<Integer> imageUrlIdPosition = new ArrayList<>();
 
     @Autowired
     public MatcherService(MatcherStateRepository matcherStateRepository,
@@ -72,6 +73,7 @@ public class MatcherService {
     }
 
     private void setStrategies(long shopId) {
+        setIdentifierStrategies(new ArrayList<>());
         if(getParsedOfferRepository().eanFound(shopId)) {
             getIdentifierStrategies().add(new MatchEanStrategy(getParsedOfferRepository()));
         }
@@ -93,6 +95,8 @@ public class MatcherService {
 
     private void matchAllByIdentifier(long shopId) {
         ShopOffer offer;
+        List<ParsedOffer> parsedOffers = getParsedOfferRepository().getOffers(shopId, 100);
+        setImageUrlIdPosition(PictureIdFinder.findPictureId(parsedOffers));
         do {
             offer = getCache().getOffer(shopId, (byte)0);
             matchSingleByIdentifier(shopId, offer);
@@ -104,6 +108,14 @@ public class MatcherService {
         for(MatchIdentifierStrategy strategy : getIdentifierStrategies()) {
             ParsedOffer match = (offer != null)? strategy.match(shopId, offer) : null;
             if(match != null) {
+                if (match.getImageUrl()!= null) {
+                    String id = "";
+                    String[] urlParts = PictureIdFinder.splitUrl(match.getImageUrl());
+                    for (int index : getImageUrlIdPosition()) {
+                        id = id.concat(urlParts[index]);
+                    }
+                    match.setImageUrl(id);
+                }
                 saveResult(offer, match, strategy.getMatchingReason());
                 deleteShopOfferAndParsedOffer(shopId, offer, match);
                 return;

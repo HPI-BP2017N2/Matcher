@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 import static org.springframework.data.mongodb.core.query.Query.query;
 
@@ -47,6 +49,11 @@ public class ParsedOfferRepositoryImpl implements ParsedOfferRepository {
     @Override
     public void deleteParsedOffer(long shopId, String url) {
         getMongoTemplate().remove(query(where("_id").is(url)), Long.toString(shopId));
+    }
+
+    @Override
+    public List<ParsedOffer> getOffers(long shopId, int count) {
+        return getMongoTemplate().find(query(where("_id").exists(true)).limit(count), ParsedOffer.class, Long.toString(shopId));
     }
 
     private ParsedOffer getByIdentifier(long shopId, String identifier, String value) {

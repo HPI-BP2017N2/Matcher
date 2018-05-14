@@ -18,7 +18,7 @@ public class ParsedOffer {
     private Date crawlingTimestamp;
     @Indexed private String ean;
     @Indexed private String han;
-    @Indexed private String imageUrl;
+    private String imageUrl;
     private String sku;
     private String title;
     private String price;
