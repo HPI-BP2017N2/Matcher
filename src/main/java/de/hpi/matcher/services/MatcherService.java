@@ -131,6 +131,7 @@ public class MatcherService {
                 matchingReason,
                 100,
                 offer.getOfferKey(),
+                offer,
                 match);
 
         getMatchingResultRepository().save(offer.getShopId(), result);
