@@ -2,6 +2,7 @@ package de.hpi.matcher.persistence;
 
 
 import de.hpi.matcher.dto.ShopOffer;
+import de.hpi.modelgenerator.persistence.AttributeVector;
 import weka.core.Attribute;
 import weka.core.DenseInstance;
 import weka.core.Instances;

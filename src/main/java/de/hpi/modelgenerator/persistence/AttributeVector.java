@@ -1,4 +1,4 @@
-package de.hpi.matcher.persistence;
+package de.hpi.modelgenerator.persistence;
 
 import weka.core.Attribute;
 

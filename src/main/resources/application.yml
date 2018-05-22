@@ -39,3 +39,7 @@ cache:
  deleteOfferRoute: "/deleteOffer/"
  deleteAllRoute: "/deleteAll/"
  warmupRoute: "/warmup/"
+
+modelgenerator:
+ uri: ${MLMG_IP}
+ getModelRoute: "/getModel"

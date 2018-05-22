@@ -1,5 +1,7 @@
 package de.hpi.matcher.api;
 
+import de.hpi.matcher.dto.ScoredModel;
+import de.hpi.matcher.persistence.repo.ModelGenerator;
 import de.hpi.matcher.services.MatcherService;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -18,9 +20,16 @@ public class MatcherController {
 
     private final MatcherService matcherService;
 
+    private final ModelGenerator modelGenerator;
+
     @RequestMapping(value = "/doSth/{shopID}", method = RequestMethod.GET, produces = "application/json")
     public void doSth(@PathVariable long shopID){
-        getMatcherService().matchShop(shopID, (byte)0);
+        //getMatcherService().matchShop(shopID, (byte)0);
+
+        ScoredModel model = getModelGenerator().getModel();
+        System.out.println(model.getModelType());
+        System.out.println(model.getModel());
+
 
     }
 
