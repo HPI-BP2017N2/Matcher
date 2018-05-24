@@ -4,6 +4,7 @@ import de.hpi.matcher.dto.FinishedShop;
 import de.hpi.matcher.services.MatcherService;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,10 +13,10 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 @Getter(AccessLevel.PRIVATE)
+@RequiredArgsConstructor
 public class RabbitReceiver {
 
-    @Autowired
-    private MatcherService matcherService;
+    private final MatcherService matcherService;
 
     @RabbitListener(queues = "#{@matcherQueue}")
     public void onMessage(FinishedShop request) {

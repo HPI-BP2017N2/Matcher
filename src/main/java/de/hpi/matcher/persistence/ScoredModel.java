@@ -1,4 +1,4 @@
-package de.hpi.matcher.dto;
+package de.hpi.matcher.persistence;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;

@@ -17,6 +17,8 @@ import org.springframework.stereotype.Component;
 public class ModelGeneratorProperties {
 
     private String uri;
-    private String getModelRoute;
+    private String modelRoute;
+    private String categoryClassifierRoute;
+    private String brandClassifierRoute;
 
 }

@@ -1,12 +1,13 @@
 package de.hpi.matcher.persistence.repo;
 
-import de.hpi.matcher.dto.ScoredModel;
-import de.hpi.matcher.properties.CacheProperties;
+import de.hpi.matcher.persistence.ScoredModel;
+import de.hpi.matcher.persistence.SerializedParagraphVectors;
 import de.hpi.matcher.properties.ModelGeneratorProperties;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.deeplearning4j.models.paragraphvectors.ParagraphVectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.retry.annotation.Backoff;
@@ -36,15 +37,48 @@ public class ModelGenerator {
 
     @Retryable(
             value = {HttpClientErrorException.class },
-            maxAttempts = 5,
-            backoff = @Backoff(delay = 5000))
+            maxAttempts = 6,
+            backoff = @Backoff(delay = 5000, multiplier = 5))
     public ScoredModel getModel() {
         return getRestTemplate().getForObject(getModelURI(), ScoredModel.class);
     }
 
+    @Retryable(
+            value = {HttpClientErrorException.class },
+            maxAttempts = 6,
+            backoff = @Backoff(delay = 5000, multiplier = 5))
+    public ParagraphVectors getCategoryClassifier() {
+        return getRestTemplate().getForObject(getCategoryClassifierURI(), SerializedParagraphVectors.class).getNeuralNetwork();
+    }
+
+    @Retryable(
+            value = {HttpClientErrorException.class },
+            maxAttempts = 6,
+            backoff = @Backoff(delay = 5000, multiplier = 5))
+    public ParagraphVectors getBrandClassifier() {
+        return getRestTemplate().getForObject(getBrandClassifierURI() , SerializedParagraphVectors.class).getNeuralNetwork();
+    }
+
+
     private URI getModelURI() {
         return UriComponentsBuilder.fromUriString(getProperties().getUri())
-                .path(getProperties().getGetModelRoute())
+                .path(getProperties().getModelRoute())
+                .build()
+                .encode()
+                .toUri();
+    }
+
+    private URI getCategoryClassifierURI() {
+        return UriComponentsBuilder.fromUriString(getProperties().getUri())
+                .path(getProperties().getCategoryClassifierRoute())
+                .build()
+                .encode()
+                .toUri();
+    }
+
+    private URI getBrandClassifierURI() {
+        return UriComponentsBuilder.fromUriString(getProperties().getUri())
+                .path(getProperties().getBrandClassifierRoute())
                 .build()
                 .encode()
                 .toUri();

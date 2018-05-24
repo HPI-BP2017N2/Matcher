@@ -53,10 +53,10 @@ public class MatcherServiceTest {
         doNothing().when(getMatchingResultRepository()).save(anyLong(), any(MatchingResult.class));
 
         setService(new MatcherService(
+                getCache(),
                 null,
                 getParsedOfferRepository(),
-                getMatchingResultRepository(),
-                getCache()
+                getMatchingResultRepository()
         ));
 
     }

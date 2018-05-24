@@ -10,6 +10,7 @@ import de.hpi.matcher.persistence.repo.MatchingResultRepository;
 import de.hpi.matcher.persistence.repo.ParsedOfferRepository;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ import java.util.List;
 @Service
 @Getter(AccessLevel.PRIVATE)
 @Setter(AccessLevel.PRIVATE)
+@RequiredArgsConstructor
 public class MatcherService {
 
     private byte phase = 0;
@@ -32,18 +34,6 @@ public class MatcherService {
     private final MatchingResultRepository matchingResultRepository;
     private List<MatchIdentifierStrategy> identifierStrategies = new ArrayList<>();
     private List<Integer> imageUrlIdPosition = new ArrayList<>();
-
-    @Autowired
-    public MatcherService(MatcherStateRepository matcherStateRepository,
-                          ParsedOfferRepository parsedOfferRepository,
-                          MatchingResultRepository matchingResultRepository,
-                          Cache cache){
-        this.matcherStateRepository = matcherStateRepository;
-        this.parsedOfferRepository = parsedOfferRepository;
-        this.matchingResultRepository = matchingResultRepository;
-        this.cache = cache;
-    }
-
 
     @PostConstruct
     public void restartInterruptedMatching() {
@@ -69,6 +59,8 @@ public class MatcherService {
             matchAllByIdentifier(shopId);
         }
         setPhase((byte)(getPhase() + 1));
+
+
         clearState();
     }
 

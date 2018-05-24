@@ -33,6 +33,14 @@ state:
   password: ${MONGO_MATCHER_PW}
   database: matchingState
 
+models:
+ mongodb:
+  host: ${MONGO_IP}
+  port: ${MONGO_PORT}
+  username: ${MONGO_MATCHER_USER}
+  password: ${MONGO_MATCHER_PW}
+  database: models
+
 cache:
  uri: ${CACHE_IP}
  getOfferRoute: "/getOffer/"
@@ -42,4 +50,6 @@ cache:
 
 modelgenerator:
  uri: ${MLMG_IP}
- getModelRoute: "/getModel"
+ modelRoute: "/getModel"
+ categoryClassifierRoute: "/getCategoryClassifier/281836"
+ brandClassifierRoute: "/getBrandClassifier"
