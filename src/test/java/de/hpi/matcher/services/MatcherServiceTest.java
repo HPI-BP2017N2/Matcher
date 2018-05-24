@@ -103,7 +103,7 @@ public class MatcherServiceTest {
         verify(getCache(), times(2)).getOffer(getEXAMPLE_SHOP_ID(), getPHASE());
         verify(getParsedOfferRepository()).getByEan(getEXAMPLE_SHOP_ID(), getEXAMPLE_EAN());
         verify(getParsedOfferRepository()).getByHan(getEXAMPLE_SHOP_ID(), getEXAMPLE_HAN());
-        verify(getMatchingResultRepository(), times(0)).save(anyLong(), any(MatchingResult.class));
+        verify(getMatchingResultRepository(), never()).save(anyLong(), any(MatchingResult.class));
     }
 
     @Test
@@ -116,8 +116,8 @@ public class MatcherServiceTest {
         getService().matchShop(getEXAMPLE_SHOP_ID(), getPHASE());
 
         verify(getCache()).getOffer(getEXAMPLE_SHOP_ID(), getPHASE());
-        verify(getParsedOfferRepository(), times(0)).getByEan(anyLong(), anyString());
-        verify(getMatchingResultRepository(), times(0)).save(anyLong(), any(MatchingResult.class));
+        verify(getParsedOfferRepository(), never()).getByEan(anyLong(), anyString());
+        verify(getMatchingResultRepository(), never()).save(anyLong(), any(MatchingResult.class));
     }
 
     @Test
@@ -127,8 +127,8 @@ public class MatcherServiceTest {
 
         getService().matchShop(getEXAMPLE_SHOP_ID(), getPHASE());
 
-        verify(getParsedOfferRepository(), times(0)).getByEan(anyLong(), anyString());
-        verify(getParsedOfferRepository(), times(0)).getByHan(anyLong(), anyString());
+        verify(getParsedOfferRepository(), never()).getByEan(anyLong(), anyString());
+        verify(getParsedOfferRepository(), never()).getByHan(anyLong(), anyString());
     }
 
 }
