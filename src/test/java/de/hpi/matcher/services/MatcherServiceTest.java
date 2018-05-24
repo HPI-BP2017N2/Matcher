@@ -56,7 +56,10 @@ public class MatcherServiceTest {
                 getCache(),
                 null,
                 getParsedOfferRepository(),
-                getMatchingResultRepository()
+                getMatchingResultRepository(),
+                null,
+                null,
+                null
         ));
 
     }
