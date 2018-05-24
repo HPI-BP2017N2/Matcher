@@ -3,20 +3,22 @@ package de.hpi.matcher.services;
 import de.hpi.matcher.dto.ShopOffer;
 import de.hpi.matcher.persistence.MatchingResult;
 import de.hpi.matcher.persistence.ParsedOffer;
+import de.hpi.matcher.persistence.ScoredModel;
 import de.hpi.matcher.persistence.State;
-import de.hpi.matcher.persistence.repo.Cache;
-import de.hpi.matcher.persistence.repo.MatcherStateRepository;
-import de.hpi.matcher.persistence.repo.MatchingResultRepository;
-import de.hpi.matcher.persistence.repo.ParsedOfferRepository;
+import de.hpi.matcher.persistence.repo.*;
+import de.hpi.matcher.properties.MatcherProperties;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.deeplearning4j.models.paragraphvectors.ParagraphVectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import weka.classifiers.Classifier;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +34,9 @@ public class MatcherService {
     private final MatcherStateRepository matcherStateRepository;
     private final ParsedOfferRepository parsedOfferRepository;
     private final MatchingResultRepository matchingResultRepository;
+    private final ModelRepository modelRepository;
+    private final MatcherProperties properties;
+    private final ModelGenerator modelGenerator;
     private List<MatchIdentifierStrategy> identifierStrategies = new ArrayList<>();
     private List<Integer> imageUrlIdPosition = new ArrayList<>();
 
@@ -134,5 +139,86 @@ public class MatcherService {
         getCache().deleteOffer(shopId, shopOffer.getOfferKey());
         getParsedOfferRepository().deleteParsedOffer(shopId, parsedOffer.getUrl());
 
+    }
+
+    private ParagraphVectors getCategoryClassifier() throws IOException {
+        if(getModelRepository().categoryClassifierExists()) {
+            return getModelRepository().getCategoryClassifier();
+        }
+
+        getModelGenerator().getCategoryClassifier();
+        int retryTime = getProperties().getModelGeneratingBaseRetry();
+        ParagraphVectors classifier;
+
+        for(int attempt = 1; attempt < getProperties().getModelGeneratingMaxRetries(); attempt++) {
+            try {
+                Thread.sleep(retryTime);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            classifier = getModelRepository().getCategoryClassifier();
+            if(classifier != null) {
+                return classifier;
+            }
+
+            retryTime *= getProperties().getModelGeneratingRetryMultiplier();
+        }
+
+        throw new IOException("could not get category classifier");
+    }
+
+    private ParagraphVectors getBrandClassifier() throws IOException {
+        if(getModelRepository().brandClassifierExists()) {
+            return getModelRepository().getBrandClassifier();
+        }
+
+        getModelGenerator().getBrandClassifier();
+        int retryTime = getProperties().getModelGeneratingBaseRetry();
+        ParagraphVectors classifier;
+
+        for(int attempt = 1; attempt < getProperties().getModelGeneratingMaxRetries(); attempt++) {
+            try {
+                Thread.sleep(retryTime);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            classifier = getModelRepository().getBrandClassifier();
+            if(classifier != null) {
+                return classifier;
+            }
+
+            retryTime *= getProperties().getModelGeneratingRetryMultiplier();
+        }
+
+        throw new IOException("could not get brand classifier");
+    }
+
+    private ScoredModel getModel() throws IOException {
+        if(getModelRepository().modelExists()) {
+            return getModelRepository().getModel();
+        }
+
+        getModelGenerator().getModel();
+        int retryTime = getProperties().getModelGeneratingBaseRetry();
+        ScoredModel model;
+
+        for(int attempt = 1; attempt < getProperties().getModelGeneratingMaxRetries(); attempt++) {
+            try {
+                Thread.sleep(retryTime);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            model = getModelRepository().getModel();
+            if(model != null) {
+                return model;
+            }
+
+            retryTime *= getProperties().getModelGeneratingRetryMultiplier();
+        }
+
+        throw new IOException("could not get model");
     }
 }

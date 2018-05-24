@@ -1,6 +1,11 @@
 server:
   port: ${MATCHER_PORT}
 
+matcher:
+  modelGeneratingBaseRetry: 20000
+  modelGeneratingRetryMultiplier: 3
+  modelGeneratingMaxRetries: 7
+
 spring:
  rabbitmq:
   host: ${RABBIT_IP}

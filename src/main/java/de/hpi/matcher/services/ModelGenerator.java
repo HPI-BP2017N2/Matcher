@@ -1,4 +1,4 @@
-package de.hpi.matcher.persistence.repo;
+package de.hpi.matcher.services;
 
 import de.hpi.matcher.persistence.ScoredModel;
 import de.hpi.matcher.persistence.SerializedParagraphVectors;
@@ -13,6 +13,7 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -21,7 +22,7 @@ import java.net.URI;
 
 @Getter(AccessLevel.PRIVATE)
 @Setter(AccessLevel.PRIVATE)
-@Repository
+@Service
 @RequiredArgsConstructor
 public class ModelGenerator {
 

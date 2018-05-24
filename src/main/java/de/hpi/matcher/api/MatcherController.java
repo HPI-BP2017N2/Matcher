@@ -1,6 +1,5 @@
 package de.hpi.matcher.api;
 
-import de.hpi.matcher.persistence.repo.ModelGenerator;
 import de.hpi.matcher.persistence.repo.ModelRepository;
 import de.hpi.matcher.services.MatcherService;
 import lombok.AccessLevel;

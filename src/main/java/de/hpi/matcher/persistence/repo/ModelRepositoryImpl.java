@@ -2,6 +2,7 @@ package de.hpi.matcher.persistence.repo;
 
 import de.hpi.matcher.persistence.ScoredModel;
 import de.hpi.matcher.persistence.SerializedParagraphVectors;
+import de.hpi.matcher.properties.MatcherProperties;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.deeplearning4j.models.paragraphvectors.ParagraphVectors;
