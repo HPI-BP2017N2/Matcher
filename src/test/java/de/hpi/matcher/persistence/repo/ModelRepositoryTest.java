@@ -89,4 +89,14 @@ public class ModelRepositoryTest {
                 .findOne(any(Query.class), eq(ScoredModel.class));
 
     }
+
+    @Test
+    public void getModelAfterRetry() throws IOException {
+        getRetryProperties().setModelGeneratingMaxAttempts(2);
+        doReturn(null, getExampleScoredModel()).when(getMongoTemplate()).findOne(any(Query.class), eq(ScoredModel.class));
+        ScoredModel model = getModelRepository().getModel();
+        verify(getMongoTemplate() ,times(getRetryProperties().getModelGeneratingMaxAttempts()))
+                .findOne(any(Query.class), eq(ScoredModel.class));
+        assertEquals(getExampleScoredModel(), model);
+    }
 }
