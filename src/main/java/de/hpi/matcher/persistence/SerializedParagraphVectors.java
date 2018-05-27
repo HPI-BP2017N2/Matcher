@@ -1,9 +1,6 @@
 package de.hpi.matcher.persistence;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer;
 import org.deeplearning4j.models.paragraphvectors.ParagraphVectors;
 import org.springframework.data.annotation.Id;
@@ -15,6 +12,7 @@ import java.io.InputStream;
 @Getter(AccessLevel.PRIVATE)
 @Setter
 @NoArgsConstructor
+@EqualsAndHashCode
 public class SerializedParagraphVectors {
 
     @Id private String modelType;
@@ -30,5 +28,10 @@ public class SerializedParagraphVectors {
         }
 
         return neuralNetwork;
+    }
+
+    public SerializedParagraphVectors(byte[] bytes, String type) {
+        this.serializedNeuralNetwork = bytes;
+        this.modelType = type;
     }
 }

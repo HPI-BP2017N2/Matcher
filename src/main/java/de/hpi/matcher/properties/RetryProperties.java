@@ -9,13 +9,14 @@ import org.springframework.stereotype.Component;
 
 @Component
 @EnableConfigurationProperties
-@ConfigurationProperties("matcher")
+@ConfigurationProperties("retry")
 @Getter
 @Setter
 @Primary
-public class MatcherProperties {
+public class RetryProperties {
 
     private int modelGeneratingBaseRetry;
     private int modelGeneratingRetryMultiplier;
-    private int modelGeneratingMaxRetries;
+    private int modelGeneratingMaxAttempts;
+
 }

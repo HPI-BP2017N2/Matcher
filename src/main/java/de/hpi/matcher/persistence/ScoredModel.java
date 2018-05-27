@@ -1,6 +1,7 @@
 package de.hpi.matcher.persistence;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,6 +14,7 @@ import java.io.InputStream;
 @Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NoArgsConstructor
+@EqualsAndHashCode
 public class ScoredModel {
 
     private byte[] modelByteArray;
@@ -29,6 +31,13 @@ public class ScoredModel {
         }
 
         return model;
+    }
+
+
+    public ScoredModel(byte[] bytes, String modelType, double score) {
+        this.modelByteArray = bytes;
+        this.modelType = modelType;
+        this.score = score;
     }
 
 }

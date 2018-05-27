@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
+
 @RestController
 @Slf4j
 @Getter(AccessLevel.PRIVATE)
@@ -23,10 +25,10 @@ public class MatcherController {
     private final ModelRepository modelRepository;
 
     @RequestMapping(value = "/doSth/{shopID}", method = RequestMethod.GET, produces = "application/json")
-    public void doSth(@PathVariable long shopID){
+    public void doSth(@PathVariable long shopID) throws IOException {
         //getMatcherService().matchShop(shopID, (byte)0);
 
-        ParagraphVectors model = getModelRepository().getCategoryClassifier();
+        ParagraphVectors model = getModelRepository().getCategoryClassifier().getNeuralNetwork();
         System.out.println(model);
     }
 
