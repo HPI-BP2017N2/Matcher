@@ -2,6 +2,7 @@ package de.hpi.matcher.services;
 
 import de.hpi.machinelearning.LabelSeeker;
 import de.hpi.machinelearning.MeansBuilder;
+import de.hpi.machinelearning.persistence.FeatureInstance;
 import de.hpi.machinelearning.persistence.ScoredModel;
 import de.hpi.matcher.dto.ShopOffer;
 import de.hpi.matcher.persistence.ParsedOffer;
@@ -59,54 +60,12 @@ public class ProbabilityClassifier {
 
 
     public void setup() throws Exception {
+        startClassifierGeneration();
         getTokenizerFactory().setTokenPreProcessor(new CommonPreprocessor());
 
         loadCategoryClassifier();
         loadBrandClassifier();
         loadModel();
-    }
-
-    private void loadModel() throws Exception {
-        if(!getModelRepository().modelExists()) {
-            getModelGenerator().generateModel();
-        }
-
-        ScoredModel model = getModelRepository().getModel();
-        setModel(model.getModel());
-        setModelScore(model.getScore());
-        setModelType(model.getModelType());
-
-        log.info("Loaded model");
-    }
-
-    private void loadBrandClassifier() throws IOException {
-        if(!getModelRepository().brandClassifierExists()) {
-            getModelGenerator().generateBrandClassifier();
-        }
-
-        setBrandClassifier(getModelRepository().getBrandClassifier().getNeuralNetwork());
-        setBrandMeansBuilder(new MeansBuilder(
-                (InMemoryLookupTable<VocabWord>)getBrandClassifier().getLookupTable(),
-                getTokenizerFactory()));
-        setBrandLabelSeeker(new LabelSeeker(getBrandClassifier().getLabelsSource().getLabels(),
-                (InMemoryLookupTable<VocabWord>) getBrandClassifier().getLookupTable()));
-
-        log.info("Loaded brand classifier");
-    }
-
-    private void loadCategoryClassifier() throws IOException {
-        if(!getModelRepository().categoryClassifierExists()) {
-            getModelGenerator().generateCategoryClassifier();
-        }
-
-        setCategoryClassifier(getModelRepository().getCategoryClassifier().getNeuralNetwork());
-        setCategoryMeansBuilder(new MeansBuilder(
-                (InMemoryLookupTable<VocabWord>)getCategoryClassifier().getLookupTable(),
-                getTokenizerFactory()));
-        setCategoryLabelSeeker(new LabelSeeker(getCategoryClassifier().getLabelsSource().getLabels(),
-                (InMemoryLookupTable<VocabWord>) getCategoryClassifier().getLookupTable()));
-
-        log.info("Loaded category classifier");
     }
 
     public Pair<String, Double> getBrand(ParsedOffer offer) {
@@ -125,9 +84,63 @@ public class ProbabilityClassifier {
         return getBestScoredLabel(scores);
     }
 
-    public boolean classify(ShopOffer shopOffer, ParsedOffer parsedOffer) {
-        return false;
+    public double[] classify(ShopOffer shopOffer, ParsedOffer parsedOffer) {
+        FeatureInstance instance = new FeatureInstance(shopOffer, parsedOffer);
+        try {
+            return getModel().distributionForInstance(instance);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return new double[]{0.0, 0.0};
     }
+
+
+    private void startClassifierGeneration() {
+        if(!getModelRepository().categoryClassifierExists()) {
+            getModelGenerator().generateCategoryClassifier();
+        }
+
+        if(!getModelRepository().brandClassifierExists()) {
+            getModelGenerator().generateBrandClassifier();
+        }
+
+        if(!getModelRepository().modelExists()) {
+            getModelGenerator().generateModel();
+        }
+    }
+
+    private void loadModel() throws Exception {
+        ScoredModel model = getModelRepository().getModel();
+        setModel(model.getModel());
+        setModelScore(model.getScore());
+        setModelType(model.getModelType());
+
+        log.info("Loaded model");
+    }
+
+    private void loadBrandClassifier() throws IOException {
+        setBrandClassifier(getModelRepository().getBrandClassifier().getNeuralNetwork());
+        setBrandMeansBuilder(new MeansBuilder(
+                (InMemoryLookupTable<VocabWord>)getBrandClassifier().getLookupTable(),
+                getTokenizerFactory()));
+        setBrandLabelSeeker(new LabelSeeker(getBrandClassifier().getLabelsSource().getLabels(),
+                (InMemoryLookupTable<VocabWord>) getBrandClassifier().getLookupTable()));
+
+        log.info("Loaded brand classifier");
+    }
+
+    private void loadCategoryClassifier() throws IOException {
+        setCategoryClassifier(getModelRepository().getCategoryClassifier().getNeuralNetwork());
+        setCategoryMeansBuilder(new MeansBuilder(
+                (InMemoryLookupTable<VocabWord>)getCategoryClassifier().getLookupTable(),
+                getTokenizerFactory()));
+        setCategoryLabelSeeker(new LabelSeeker(getCategoryClassifier().getLabelsSource().getLabels(),
+                (InMemoryLookupTable<VocabWord>) getCategoryClassifier().getLookupTable()));
+
+        log.info("Loaded category classifier");
+    }
+
 
     private LabelledDocument getLabelledDocumentFromParsedOffer(ParsedOffer offer) {
         LabelledDocument document = new LabelledDocument();
