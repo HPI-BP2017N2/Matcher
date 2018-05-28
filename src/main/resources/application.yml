@@ -1,6 +1,9 @@
 server:
   port: ${MATCHER_PORT}
 
+matcher:
+  labelThreshold: 0.5
+
 retry:
   modelGeneratingBaseRetry: 20000
   modelGeneratingRetryMultiplier: 3

@@ -1,7 +1,7 @@
 package de.hpi.matcher.persistence.repo;
 
-import de.hpi.matcher.persistence.ScoredModel;
-import de.hpi.matcher.persistence.SerializedParagraphVectors;
+import de.hpi.machinelearning.persistence.ScoredModel;
+import de.hpi.machinelearning.persistence.SerializedParagraphVectors;
 import de.hpi.matcher.properties.RetryProperties;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -47,8 +47,8 @@ public class ModelRepositoryTest {
     public void setup() {
         initMocks(this);
         setExampleScoredModel(new ScoredModel(null, getMODEL_TYPE(), getEXAMPLE_SCORE()));
-        setExampleBrandClassifier(new SerializedParagraphVectors(null, getBRAND_IDENTIFIER()));
-        setExampleCategoryClassifier(new SerializedParagraphVectors(null, getCATEGORY_IDENTIFIER()));
+        setExampleBrandClassifier(new SerializedParagraphVectors(getBRAND_IDENTIFIER(), null));
+        setExampleCategoryClassifier(new SerializedParagraphVectors(getCATEGORY_IDENTIFIER(), null));
 
         setModelRepository(new ModelRepositoryImpl(getMongoTemplate(), getRetryProperties()));
 

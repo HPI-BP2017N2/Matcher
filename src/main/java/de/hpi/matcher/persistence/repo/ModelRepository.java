@@ -1,8 +1,7 @@
 package de.hpi.matcher.persistence.repo;
 
-import de.hpi.matcher.persistence.ScoredModel;
-import de.hpi.matcher.persistence.SerializedParagraphVectors;
-import org.deeplearning4j.models.paragraphvectors.ParagraphVectors;
+import de.hpi.machinelearning.persistence.ScoredModel;
+import de.hpi.machinelearning.persistence.SerializedParagraphVectors;
 
 import java.io.IOException;
 

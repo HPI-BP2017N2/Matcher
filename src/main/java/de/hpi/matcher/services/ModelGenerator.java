@@ -1,7 +1,7 @@
 package de.hpi.matcher.services;
 
-import de.hpi.matcher.persistence.ScoredModel;
-import de.hpi.matcher.persistence.SerializedParagraphVectors;
+import de.hpi.machinelearning.persistence.ScoredModel;
+import de.hpi.machinelearning.persistence.SerializedParagraphVectors;
 import de.hpi.matcher.properties.ModelGeneratorProperties;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -12,12 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.io.IOException;
 import java.net.URI;
 
 @Getter(AccessLevel.PRIVATE)
@@ -48,7 +48,7 @@ public class ModelGenerator {
             value = {HttpClientErrorException.class },
             maxAttempts = 6,
             backoff = @Backoff(delay = 5000, multiplier = 5))
-    public ParagraphVectors getCategoryClassifier() {
+    public ParagraphVectors getCategoryClassifier() throws IOException {
         return getRestTemplate().getForObject(getCategoryClassifierURI(), SerializedParagraphVectors.class).getNeuralNetwork();
     }
 
@@ -56,7 +56,7 @@ public class ModelGenerator {
             value = {HttpClientErrorException.class },
             maxAttempts = 6,
             backoff = @Backoff(delay = 5000, multiplier = 5))
-    public ParagraphVectors getBrandClassifier() {
+    public ParagraphVectors getBrandClassifier() throws IOException {
         return getRestTemplate().getForObject(getBrandClassifierURI() , SerializedParagraphVectors.class).getNeuralNetwork();
     }
 

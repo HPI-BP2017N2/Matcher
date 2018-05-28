@@ -13,5 +13,6 @@ public interface ParsedOfferRepository {
     ParsedOffer getByHan(long shopId, String han);
     void deleteParsedOffer(long shopId, String url);
     List<ParsedOffer> getOffers(long shopId, int count);
+    List<ParsedOffer> getOffersWithImageUrl(long shopId, int count);
 
 }

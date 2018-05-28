@@ -56,6 +56,11 @@ public class ParsedOfferRepositoryImpl implements ParsedOfferRepository {
         return getMongoTemplate().find(query(where("_id").exists(true)).limit(count), ParsedOffer.class, Long.toString(shopId));
     }
 
+    @Override
+    public List<ParsedOffer> getOffersWithImageUrl(long shopId, int count) {
+        return getMongoTemplate().find(query(where("imageUrl").exists(true)).limit(count), ParsedOffer.class, Long.toString(shopId));
+    }
+
     private ParsedOffer getByIdentifier(long shopId, String identifier, String value) {
         return (value != null)?
                 getMongoTemplate().findOne(query(where(identifier).is(value)), ParsedOffer.class, Long.toString(shopId))

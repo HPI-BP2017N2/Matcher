@@ -59,6 +59,7 @@ public class MatcherServiceTest {
                 getMatchingResultRepository(),
                 null,
                 null,
+                null,
                 null
         ));
 

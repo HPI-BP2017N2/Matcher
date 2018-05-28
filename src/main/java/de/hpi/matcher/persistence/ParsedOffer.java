@@ -25,5 +25,6 @@ public class ParsedOffer {
     private String description;
     private String brandName;
     private String category;
+    private String imageId;
 
 }

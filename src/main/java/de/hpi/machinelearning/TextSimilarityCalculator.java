@@ -1,4 +1,4 @@
-package de.hpi.matcher.services;
+package de.hpi.machinelearning;
 
 import java.util.*;
 

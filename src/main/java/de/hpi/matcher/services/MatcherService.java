@@ -1,17 +1,18 @@
 package de.hpi.matcher.services;
 
+import de.hpi.machinelearning.PictureIdFinder;
 import de.hpi.matcher.dto.ShopOffer;
 import de.hpi.matcher.persistence.MatchingResult;
 import de.hpi.matcher.persistence.ParsedOffer;
-import de.hpi.matcher.persistence.ScoredModel;
 import de.hpi.matcher.persistence.State;
 import de.hpi.matcher.persistence.repo.*;
+import de.hpi.matcher.properties.MatcherProperties;
 import de.hpi.matcher.properties.RetryProperties;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.deeplearning4j.models.paragraphvectors.ParagraphVectors;
+import org.nd4j.linalg.primitives.Pair;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -28,22 +29,25 @@ public class MatcherService {
 
     private byte phase = 0;
     private long shopId = 0;
+    private List<Integer> pictureIds;
     private final Cache cache;
     private final MatcherStateRepository matcherStateRepository;
     private final ParsedOfferRepository parsedOfferRepository;
     private final MatchingResultRepository matchingResultRepository;
     private final ModelRepository modelRepository;
-    private final RetryProperties properties;
     private final ModelGenerator modelGenerator;
+    private final ProbabilityClassifier classifier;
+    private final MatcherProperties properties;
     private List<MatchIdentifierStrategy> identifierStrategies = new ArrayList<>();
     private List<Integer> imageUrlIdPosition = new ArrayList<>();
 
     @PostConstruct
-    public void restartInterruptedMatching() {
+    public void restartInterruptedMatching() throws Exception {
         State state = getMatcherStateRepository().popState();
         if(state != null) {
             matchShop(state.getShopId(), state.getPhase());
         }
+        getClassifier().setup();
     }
 
     @PreDestroy
@@ -57,6 +61,7 @@ public class MatcherService {
         setupState(shopId, phase);
         getCache().warmup(shopId);
         setStrategies(shopId);
+        setImageIds(shopId);
 
         if(!getIdentifierStrategies().isEmpty()){
             matchAllByIdentifier(shopId);
@@ -65,6 +70,11 @@ public class MatcherService {
 
 
         clearState();
+    }
+
+    private void setImageIds(long shopId) {
+        List<ParsedOffer> offers = getParsedOfferRepository().getOffersWithImageUrl(shopId, 50);
+        setPictureIds(PictureIdFinder.findPictureId(offers));
     }
 
     private void setStrategies(long shopId) {
@@ -104,18 +114,35 @@ public class MatcherService {
             ParsedOffer match = (offer != null)? strategy.match(shopId, offer) : null;
             if(match != null) {
                 if (match.getImageUrl()!= null) {
-                    String id = "";
-                    String[] urlParts = PictureIdFinder.splitUrl(match.getImageUrl());
-                    for (int index : getImageUrlIdPosition()) {
-                        id = id.concat(urlParts[index]);
-                    }
-                    match.setImageUrl(id);
+                    match.setImageId(PictureIdFinder.getImageId(match.getImageUrl(), getPictureIds()));
                 }
+
+                match.setBrandName(getBrand(match));
+                match.setCategory(getCategory(match));
                 saveResult(offer, match, strategy.getMatchingReason());
                 deleteShopOfferAndParsedOffer(shopId, offer, match);
                 return;
             }
         }
+    }
+
+    private String getCategory(ParsedOffer match) {
+        if(match.getTitle() != null) {
+            Pair<String, Double> pair = getClassifier().getCategory(match);
+            return pair.getRight() < getProperties().getLabelThreshold() ? null : pair.getLeft();
+        }
+
+        return null;
+    }
+
+    private String getBrand(ParsedOffer match) {
+        if(match.getTitle() != null) {
+            Pair<String, Double> pair = getClassifier().getBrand(match);
+            return pair.getRight() < getProperties().getLabelThreshold() ? null : pair.getLeft();
+        }
+
+        return null;
+
     }
 
     private void saveResult(ShopOffer offer,
@@ -126,7 +153,10 @@ public class MatcherService {
                 matchingReason,
                 100,
                 offer.getOfferKey(),
-                offer,
+                offer.getMappedCatalogCategory(),
+                offer.getCategoryName(),
+                offer.getHigherLevelCategory(),
+                offer.getHigherLevelCategoryName(),
                 match);
 
         getMatchingResultRepository().save(offer.getShopId(), result);

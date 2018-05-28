@@ -1,14 +1,11 @@
 package de.hpi.matcher.persistence.repo;
 
-import de.hpi.matcher.persistence.ScoredModel;
-import de.hpi.matcher.persistence.SerializedParagraphVectors;
+import de.hpi.machinelearning.persistence.ScoredModel;
+import de.hpi.machinelearning.persistence.SerializedParagraphVectors;
 import de.hpi.matcher.properties.RetryProperties;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.deeplearning4j.models.paragraphvectors.ParagraphVectors;
-import org.deeplearning4j.models.sequencevectors.SequenceVectors;
-import org.deeplearning4j.models.word2vec.VocabWord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -51,21 +48,21 @@ public class ModelRepositoryImpl implements ModelRepository {
     public SerializedParagraphVectors getCategoryClassifier() throws IOException {
         return getClassifierByType("category",
                 getNeuralNetworkQueryByType("category"),
-                new SerializedParagraphVectors());
+                new SerializedParagraphVectors(null, null));
     }
 
     @Override
     public SerializedParagraphVectors getBrandClassifier() throws IOException {
         return getClassifierByType("brand",
                 getNeuralNetworkQueryByType("brand"),
-                new SerializedParagraphVectors());
+                new SerializedParagraphVectors(null, null));
     }
 
     @Override
     public ScoredModel getModel() throws IOException {
         return getClassifierByType("model",
                 query(where("_id").exists(true)),
-                new ScoredModel());
+                new ScoredModel(null, null, 0.0));
     }
 
     private boolean classifierExists(String id) {

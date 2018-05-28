@@ -1,5 +1,6 @@
 package de.hpi.matcher.services;
 
+import de.hpi.machinelearning.TextSimilarityCalculator;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.junit.Test;
