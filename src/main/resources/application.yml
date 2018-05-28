@@ -58,6 +58,6 @@ cache:
 
 modelgenerator:
  uri: ${MLMG_IP}
- modelRoute: "/getModel"
- categoryClassifierRoute: "/getCategoryClassifier/281836"
- brandClassifierRoute: "/getBrandClassifier"
+ modelRoute: "/generateModel"
+ categoryClassifierRoute: "/generateCategoryClassifier"
+ brandClassifierRoute: "/generateBrandClassifier"

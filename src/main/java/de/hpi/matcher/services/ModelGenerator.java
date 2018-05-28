@@ -37,27 +37,27 @@ public class ModelGenerator {
     }
 
     @Retryable(
-            value = {HttpClientErrorException.class },
-            maxAttempts = 6,
-            backoff = @Backoff(delay = 5000, multiplier = 5))
-    public ScoredModel getModel() {
-        return getRestTemplate().getForObject(getModelURI(), ScoredModel.class);
+            value = { HttpClientErrorException.class },
+            maxAttempts = 5,
+            backoff = @Backoff(delay = 5000))
+    public void generateModel() {
+        getRestTemplate().postForLocation(getModelURI(), null);
     }
 
     @Retryable(
-            value = {HttpClientErrorException.class },
-            maxAttempts = 6,
-            backoff = @Backoff(delay = 5000, multiplier = 5))
-    public ParagraphVectors getCategoryClassifier() throws IOException {
-        return getRestTemplate().getForObject(getCategoryClassifierURI(), SerializedParagraphVectors.class).getNeuralNetwork();
+            value = { HttpClientErrorException.class },
+            maxAttempts = 5,
+            backoff = @Backoff(delay = 5000))
+    public void generateCategoryClassifier() {
+        getRestTemplate().postForLocation(getCategoryClassifierURI(), null);
     }
 
     @Retryable(
-            value = {HttpClientErrorException.class },
-            maxAttempts = 6,
-            backoff = @Backoff(delay = 5000, multiplier = 5))
-    public ParagraphVectors getBrandClassifier() throws IOException {
-        return getRestTemplate().getForObject(getBrandClassifierURI() , SerializedParagraphVectors.class).getNeuralNetwork();
+            value = { HttpClientErrorException.class },
+            maxAttempts = 5,
+            backoff = @Backoff(delay = 5000))
+    public void generateBrandClassifier() {
+        getRestTemplate().postForLocation(getBrandClassifierURI() , null);
     }
 
 

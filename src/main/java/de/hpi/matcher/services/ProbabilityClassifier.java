@@ -68,7 +68,7 @@ public class ProbabilityClassifier {
 
     private void loadModel() throws Exception {
         if(!getModelRepository().modelExists()) {
-            getModelGenerator().getModel();
+            getModelGenerator().generateModel();
         }
 
         ScoredModel model = getModelRepository().getModel();
@@ -81,7 +81,7 @@ public class ProbabilityClassifier {
 
     private void loadBrandClassifier() throws IOException {
         if(!getModelRepository().brandClassifierExists()) {
-            getModelGenerator().getBrandClassifier();
+            getModelGenerator().generateBrandClassifier();
         }
 
         setBrandClassifier(getModelRepository().getBrandClassifier().getNeuralNetwork());
@@ -96,7 +96,7 @@ public class ProbabilityClassifier {
 
     private void loadCategoryClassifier() throws IOException {
         if(!getModelRepository().categoryClassifierExists()) {
-            getModelGenerator().getCategoryClassifier();
+            getModelGenerator().generateCategoryClassifier();
         }
 
         setCategoryClassifier(getModelRepository().getCategoryClassifier().getNeuralNetwork());
