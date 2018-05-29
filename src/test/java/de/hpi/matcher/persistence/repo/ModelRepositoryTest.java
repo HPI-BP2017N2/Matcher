@@ -50,7 +50,7 @@ public class ModelRepositoryTest {
         setExampleBrandClassifier(new SerializedParagraphVectors(getBRAND_IDENTIFIER(), null));
         setExampleCategoryClassifier(new SerializedParagraphVectors(getCATEGORY_IDENTIFIER(), null));
 
-        setModelRepository(new ModelRepositoryImpl(getMongoTemplate(), getRetryProperties()));
+        setModelRepository(new ModelRepository(getMongoTemplate(), getRetryProperties()));
 
         getRetryProperties().setModelGeneratingBaseRetry(1);
         getRetryProperties().setModelGeneratingMaxAttempts(1);

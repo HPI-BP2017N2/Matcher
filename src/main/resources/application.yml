@@ -3,6 +3,7 @@ server:
 
 matcher:
   labelThreshold: 0.5
+  matchingThreshold: 0.5
 
 retry:
   modelGeneratingBaseRetry: 20000
@@ -51,8 +52,10 @@ models:
 
 cache:
  uri: ${CACHE_IP}
- getOfferRoute: "/getOffer/"
- deleteOfferRoute: "/deleteOffer/"
+ getOfferRoute: "/getOfferAndUpdatePhase/"
+ deleteOfferRoute: "/markAsMatched/"
+ getUnmatchedOfferRoute: "/getUnmatchedOfferAndUpdatePhase/"
+ updatePhaseRoute: "/updatePhase/"
  deleteAllRoute: "/deleteAll/"
  warmupRoute: "/warmup/"
 

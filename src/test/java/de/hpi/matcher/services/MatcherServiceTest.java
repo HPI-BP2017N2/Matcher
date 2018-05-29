@@ -4,8 +4,8 @@ import de.hpi.matcher.dto.ShopOffer;
 import de.hpi.matcher.persistence.MatchingResult;
 import de.hpi.matcher.persistence.ParsedOffer;
 import de.hpi.matcher.persistence.repo.Cache;
-import de.hpi.matcher.persistence.repo.MatchingResultRepositoryImpl;
-import de.hpi.matcher.persistence.repo.ParsedOfferRepositoryImpl;
+import de.hpi.matcher.persistence.repo.MatchingResultRepository;
+import de.hpi.matcher.persistence.repo.ParsedOfferRepository;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -33,8 +33,8 @@ public class MatcherServiceTest {
     private final ParsedOffer parsedOffer = new ParsedOffer();
     private final ShopOffer shopOffer = new ShopOffer();
 
-    @Mock private ParsedOfferRepositoryImpl parsedOfferRepository;
-    @Mock private MatchingResultRepositoryImpl matchingResultRepository;
+    @Mock private ParsedOfferRepository parsedOfferRepository;
+    @Mock private MatchingResultRepository matchingResultRepository;
     @Mock private Cache cache;
 
     private MatcherService service;

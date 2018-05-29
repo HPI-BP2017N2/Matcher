@@ -2,7 +2,7 @@ package de.hpi.matcher.services;
 
 import de.hpi.matcher.dto.ShopOffer;
 import de.hpi.matcher.persistence.ParsedOffer;
-import de.hpi.matcher.persistence.repo.ParsedOfferRepositoryImpl;
+import de.hpi.matcher.persistence.repo.ParsedOfferRepository;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -29,7 +29,7 @@ public class MatchEanStrategyTest {
     private final ShopOffer shopOffer = new ShopOffer();
 
     @Mock
-    private ParsedOfferRepositoryImpl repository;
+    private ParsedOfferRepository repository;
 
     private MatchEanStrategy strategy;
 

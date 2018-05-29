@@ -7,7 +7,6 @@ import de.hpi.matcher.persistence.ParsedOffer;
 import de.hpi.matcher.persistence.State;
 import de.hpi.matcher.persistence.repo.*;
 import de.hpi.matcher.properties.MatcherProperties;
-import de.hpi.matcher.properties.RetryProperties;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -17,9 +16,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Service
 @Getter(AccessLevel.PRIVATE)
@@ -43,11 +40,18 @@ public class MatcherService {
 
     @PostConstruct
     public void restartInterruptedMatching() throws Exception {
-        State state = getMatcherStateRepository().popState();
-        if(state != null) {
-            matchShop(state.getShopId(), state.getPhase());
-        }
-        getClassifier().setup();
+        State state = null;
+        do {
+            state = getMatcherStateRepository().popState();
+            if (state != null) {
+                if (state.getPhase() == (byte) 1) {
+                    getCache().updatePhase(state.getShopId(), (byte) (state.getPhase() + 1), state.getPhase());
+                }
+
+                matchShop(state.getShopId(), state.getPhase());
+            }
+
+        } while (state != null );
     }
 
     @PreDestroy
@@ -57,7 +61,7 @@ public class MatcherService {
         }
     }
 
-    public void matchShop(long shopId, byte phase) {
+    public void matchShop(long shopId, byte phase) throws Exception {
         setupState(shopId, phase);
         getCache().warmup(shopId);
         setStrategies(shopId);
@@ -66,7 +70,16 @@ public class MatcherService {
         if(!getIdentifierStrategies().isEmpty()){
             matchAllByIdentifier(shopId);
         }
+
+        if(!getModelRepository().allClassifiersExist()) {
+            saveState();
+            clearState();
+            return;
+        }
+
         setPhase((byte)(getPhase() + 1));
+        getClassifier().loadModels();
+        matchRemaining(shopId);
 
 
         clearState();
@@ -109,6 +122,22 @@ public class MatcherService {
 
     }
 
+    private void matchRemaining(long shopId) {
+        List<ShopOffer> shopOffers = new LinkedList<>();
+        ShopOffer offer = null;
+        do {
+            offer = getCache().getOffer(shopId, (byte)1);
+            shopOffers.add(offer);
+        } while (offer != null);
+
+        List<ParsedOffer> parsedOffers = getParsedOfferRepository().getAllOffers(shopId);
+
+
+
+        double[][] matchScores = generateScoreMatrix(shopOffers, parsedOffers);
+        findAndSaveBestMatches(matchScores, shopOffers, parsedOffers);
+    }
+
     private void matchSingleByIdentifier(long shopId, ShopOffer offer) {
         for(MatchIdentifierStrategy strategy : getIdentifierStrategies()) {
             ParsedOffer match = (offer != null)? strategy.match(shopId, offer) : null;
@@ -116,9 +145,6 @@ public class MatcherService {
                 if (match.getImageUrl()!= null) {
                     match.setImageId(PictureIdFinder.getImageId(match.getImageUrl(), getPictureIds()));
                 }
-
-                match.setBrandName(getBrand(match));
-                match.setCategory(getCategory(match));
                 saveResult(offer, match, strategy.getMatchingReason());
                 deleteShopOfferAndParsedOffer(shopId, offer, match);
                 return;
@@ -126,18 +152,38 @@ public class MatcherService {
         }
     }
 
-    private String getCategory(ParsedOffer match) {
-        if(match.getTitle() != null) {
-            Pair<String, Double> pair = getClassifier().getCategory(match);
+    private double[][] generateScoreMatrix(List<ShopOffer> shopOffers, List<ParsedOffer> parsedOffers) {
+        double[][] scoreMatrix = new double[parsedOffers.size()][shopOffers.size()];
+
+        for(int i = 0; i < parsedOffers.size(); i++) {
+            ParsedOffer parsedOffer = parsedOffers.get(i);
+            parsedOffer.setBrandName(getBrand(parsedOffer.getTitle()));
+            parsedOffer.setCategory(getCategory(parsedOffer.getTitle()));
+
+            for(int j = 0; j < shopOffers.size(); j++) {
+                scoreMatrix[i][j] = getClassifier().getMatchProbability(shopOffers.get(j), parsedOffer);
+            }
+        }
+
+        return scoreMatrix;
+    }
+
+    private void findAndSaveBestMatches(double[][] matchScores, List<ShopOffer> shopOffers, List<ParsedOffer> parsedOffers) {
+
+    }
+
+    private String getCategory(String offerTitle) {
+        if(offerTitle != null) {
+            Pair<String, Double> pair = getClassifier().getCategory(offerTitle);
             return pair.getRight() < getProperties().getLabelThreshold() ? null : pair.getLeft();
         }
 
         return null;
     }
 
-    private String getBrand(ParsedOffer match) {
-        if(match.getTitle() != null) {
-            Pair<String, Double> pair = getClassifier().getBrand(match);
+    private String getBrand(String offerTitle) {
+        if(offerTitle != null) {
+            Pair<String, Double> pair = getClassifier().getBrand(offerTitle);
             return pair.getRight() < getProperties().getLabelThreshold() ? null : pair.getLeft();
         }
 
@@ -167,6 +213,34 @@ public class MatcherService {
         getCache().deleteOffer(shopId, shopOffer.getOfferKey());
         getParsedOfferRepository().deleteParsedOffer(shopId, parsedOffer.getUrl());
 
+    }
+
+    public void classify() {
+        ShopOffer shopOffer = new ShopOffer();
+        ParsedOffer parsedOffer = new ParsedOffer();
+        Map<String, String> title = new HashMap<>();
+        title.put("0", "iPhone6");
+        shopOffer.setTitles(title);
+        parsedOffer.setTitle("iPhone7");
+        shopOffer.setDescriptions(title);
+        parsedOffer.setBrandName("Appe");
+        shopOffer.setBrandName("Apple");
+        parsedOffer.setPrice("1000");
+        Map<String, Double> price = new HashMap<>();
+        price.put("0", 1000d);
+        shopOffer.setPrices(price);
+        shopOffer.setMappedCatalogCategory("12345");
+        parsedOffer.setCategory("12345");
+        Map<String, String> url = new HashMap<>();
+        url.put("0", "http://example.com/123");
+        shopOffer.setUrls(url);
+        parsedOffer.setUrl("http://example.com/123");
+        shopOffer.setImageId("qwerty");
+        parsedOffer.setImageUrl( "qwerty");
+        parsedOffer.setSku("abc");
+        shopOffer.setSku("abc");
+
+        System.out.println(getClassifier().getMatchProbability(shopOffer, parsedOffer));
     }
 
 }

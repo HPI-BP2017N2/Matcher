@@ -59,7 +59,7 @@ public class ProbabilityClassifier {
     private LabelSeeker brandLabelSeeker;
 
 
-    public void setup() throws Exception {
+    public void loadModels() throws Exception {
         startClassifierGeneration();
         getTokenizerFactory().setTokenPreProcessor(new CommonPreprocessor());
 
@@ -68,31 +68,37 @@ public class ProbabilityClassifier {
         loadModel();
     }
 
-    public Pair<String, Double> getBrand(ParsedOffer offer) {
-        LabelledDocument document = getLabelledDocumentFromParsedOffer(offer);
+    public Pair<String, Double> getBrand(String offerTitle) {
+        LabelledDocument document = getLabelledDocumentFromTitle(offerTitle);
         INDArray documentAsCentroid = getBrandMeansBuilder().documentAsVector(document);
         List<Pair<String, Double>> scores = getBrandLabelSeeker().getScores(documentAsCentroid);
 
         return getBestScoredLabel(scores);
     }
 
-    public Pair<String, Double> getCategory(ParsedOffer offer) {
-        LabelledDocument document = getLabelledDocumentFromParsedOffer(offer);
+    public Pair<String, Double> getCategory(String offerTitle) {
+        LabelledDocument document = getLabelledDocumentFromTitle(offerTitle);
         INDArray documentAsCentroid = getCategoryMeansBuilder().documentAsVector(document);
         List<Pair<String, Double>> scores = getCategoryLabelSeeker().getScores(documentAsCentroid);
 
         return getBestScoredLabel(scores);
     }
 
-    public double[] classify(ShopOffer shopOffer, ParsedOffer parsedOffer) {
+    public double getMatchProbability(ShopOffer shopOffer, ParsedOffer parsedOffer) {
         FeatureInstance instance = new FeatureInstance(shopOffer, parsedOffer);
+        double[] classifyingProbabilities = null;
         try {
-            return getModel().distributionForInstance(instance);
+            classifyingProbabilities = getModel().distributionForInstance(instance);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return new double[]{0.0, 0.0};
+        if(classifyingProbabilities != null) {
+            // first value is match probability, second not-match probability
+            return classifyingProbabilities[0];
+        }
+
+        return 0.0;
     }
 
 
@@ -142,9 +148,9 @@ public class ProbabilityClassifier {
     }
 
 
-    private LabelledDocument getLabelledDocumentFromParsedOffer(ParsedOffer offer) {
+    private LabelledDocument getLabelledDocumentFromTitle(String offerTitle) {
         LabelledDocument document = new LabelledDocument();
-        document.setContent(offer.getTitle());
+        document.setContent(offerTitle);
         return document;
     }
 

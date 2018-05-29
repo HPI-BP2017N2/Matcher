@@ -8,8 +8,7 @@ import org.springframework.data.annotation.Id;
 @Setter
 public class State {
 
-    @Id
-    private long shopId;
+    @Id private long shopId;
     private byte phase;
 
     public State(long shopId, byte phase) {

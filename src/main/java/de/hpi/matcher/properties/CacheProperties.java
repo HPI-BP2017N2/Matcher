@@ -20,4 +20,6 @@ public class CacheProperties {
     private String deleteOfferRoute;
     private String deleteAllRoute;
     private String warmupRoute;
+    private String getUnmatchedOfferRoute;
+    private String updatePhaseRoute;
 }
