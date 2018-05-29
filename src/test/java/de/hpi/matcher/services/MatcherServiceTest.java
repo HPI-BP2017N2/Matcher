@@ -3,9 +3,7 @@ package de.hpi.matcher.services;
 import de.hpi.matcher.dto.ShopOffer;
 import de.hpi.matcher.persistence.MatchingResult;
 import de.hpi.matcher.persistence.ParsedOffer;
-import de.hpi.matcher.persistence.repo.Cache;
-import de.hpi.matcher.persistence.repo.MatchingResultRepository;
-import de.hpi.matcher.persistence.repo.ParsedOfferRepository;
+import de.hpi.matcher.persistence.repo.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -36,6 +34,8 @@ public class MatcherServiceTest {
     @Mock private ParsedOfferRepository parsedOfferRepository;
     @Mock private MatchingResultRepository matchingResultRepository;
     @Mock private Cache cache;
+    @Mock private ModelRepository modelRepository;
+    @Mock private MatcherStateRepository matcherStateRepository;
 
     private MatcherService service;
     private MatchingResult result;
@@ -51,13 +51,16 @@ public class MatcherServiceTest {
         getShopOffer().setShopId(getEXAMPLE_SHOP_ID());
 
         doNothing().when(getMatchingResultRepository()).save(anyLong(), any(MatchingResult.class));
+        doNothing().when(getMatcherStateRepository()).saveState(anyLong(), anyByte());
+
+        doReturn(false).when(getModelRepository()).allClassifiersExist();
 
         setService(new MatcherService(
                 getCache(),
-                null,
+                getMatcherStateRepository(),
                 getParsedOfferRepository(),
                 getMatchingResultRepository(),
-                null,
+                getModelRepository(),
                 null,
                 null,
                 null
