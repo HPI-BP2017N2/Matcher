@@ -14,4 +14,5 @@ public class MatchingResultMongoConfig extends  AbstractMongoConfig{
     MongoTemplate getMongoTemplate() throws Exception {
         return new MongoTemplate(mongoDbFactory());
     }
+
 }

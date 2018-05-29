@@ -16,4 +16,5 @@ public class ParsedOfferMongoConfig extends AbstractMongoConfig {
     MongoTemplate getMongoTemplate() throws Exception {
         return new MongoTemplate(mongoDbFactory());
     }
+
 }

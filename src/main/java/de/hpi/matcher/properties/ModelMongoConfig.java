@@ -13,6 +13,5 @@ public class ModelMongoConfig extends AbstractMongoConfig {
     MongoTemplate getMongoTemplate() throws Exception {
         return new MongoTemplate(mongoDbFactory());
     }
+
 }
-
-

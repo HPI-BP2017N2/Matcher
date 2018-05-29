@@ -25,6 +25,7 @@ public class ModelRepository {
 
     public static final String CATEGORY = "category";
     public static final String BRAND = "brand";
+
     @Autowired
     @Qualifier(value = "modelTemplate")
     private final MongoTemplate mongoTemplate;

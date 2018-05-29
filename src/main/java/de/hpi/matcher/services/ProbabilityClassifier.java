@@ -35,25 +35,14 @@ import java.util.List;
 public class ProbabilityClassifier {
 
     private final ModelRepository modelRepository;
-
     private final TokenizerFactory tokenizerFactory = new DefaultTokenizerFactory();
 
     private ParagraphVectors categoryClassifier;
-
     private ParagraphVectors brandClassifier;
-
     private Classifier model;
-
-    private String modelType;
-
-    private double modelScore;
-
     private MeansBuilder categoryMeansBuilder;
-
     private MeansBuilder brandMeansBuilder;
-
     private LabelSeeker categoryLabelSeeker;
-
     private LabelSeeker brandLabelSeeker;
 
 
@@ -97,10 +86,8 @@ public class ProbabilityClassifier {
     private void loadModel() throws Exception {
         ScoredModel model = getModelRepository().getModel();
         setModel(model.getModel());
-        setModelScore(model.getScore());
-        setModelType(model.getModelType());
 
-        log.info("Loaded model");
+        log.info("Loaded model '{}' with classification error {}", model.getModelType(), model.getScore());
     }
 
     private void loadBrandClassifier() throws IOException {

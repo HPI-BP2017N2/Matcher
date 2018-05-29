@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class MeansBuilder {
+
     private VocabCache<VocabWord> vocabCache;
     private InMemoryLookupTable<VocabWord> lookupTable;
     private TokenizerFactory tokenizerFactory;

@@ -16,6 +16,6 @@ import org.springframework.stereotype.Component;
 public class MatcherProperties {
 
     private double labelThreshold;
-
+    private double matchingThreshold;
 
 }

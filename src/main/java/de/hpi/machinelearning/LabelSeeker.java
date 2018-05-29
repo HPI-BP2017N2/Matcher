@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LabelSeeker {
+
     private List<String> labelsUsed;
     private InMemoryLookupTable<VocabWord> lookupTable;
 

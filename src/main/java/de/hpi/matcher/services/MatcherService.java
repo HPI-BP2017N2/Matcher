@@ -24,9 +24,6 @@ import java.util.*;
 @RequiredArgsConstructor
 public class MatcherService {
 
-    private byte phase = 0;
-    private long shopId = 0;
-    private List<Integer> pictureIds;
     private final Cache cache;
     private final MatcherStateRepository matcherStateRepository;
     private final ParsedOfferRepository parsedOfferRepository;
@@ -34,6 +31,10 @@ public class MatcherService {
     private final ModelRepository modelRepository;
     private final ProbabilityClassifier classifier;
     private final MatcherProperties properties;
+
+    private byte phase = 0;
+    private long shopId = 0;
+    private List<Integer> pictureIds;
     private List<MatchIdentifierStrategy> identifierStrategies = new ArrayList<>();
     private List<Integer> imageUrlIdPosition = new ArrayList<>();
 

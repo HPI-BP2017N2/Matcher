@@ -22,4 +22,5 @@ public class CacheProperties {
     private String warmupRoute;
     private String getUnmatchedOfferRoute;
     private String updatePhaseRoute;
+
 }
