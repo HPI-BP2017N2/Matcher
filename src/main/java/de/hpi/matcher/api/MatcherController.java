@@ -1,7 +1,6 @@
 package de.hpi.matcher.api;
 
 import de.hpi.matcher.services.MatcherService;
-import de.hpi.matcher.services.ModelGenerator;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +18,6 @@ import java.io.IOException;
 public class MatcherController {
 
     private final MatcherService matcherService;
-
-    private final ModelGenerator modelGenerator;
 
     @RequestMapping(value = "/doSth", method = RequestMethod.GET, produces = "application/json")
     public void doSth() throws IOException {

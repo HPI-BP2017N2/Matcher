@@ -32,7 +32,6 @@ public class MatcherService {
     private final ParsedOfferRepository parsedOfferRepository;
     private final MatchingResultRepository matchingResultRepository;
     private final ModelRepository modelRepository;
-    private final ModelGenerator modelGenerator;
     private final ProbabilityClassifier classifier;
     private final MatcherProperties properties;
     private List<MatchIdentifierStrategy> identifierStrategies = new ArrayList<>();
@@ -70,17 +69,17 @@ public class MatcherService {
         setStrategies(shopId);
         setImageIds(shopId);
 
-        if(!getIdentifierStrategies().isEmpty()){
+        if(!getIdentifierStrategies().isEmpty() && phase == (byte) 0){
             matchAllByIdentifier(shopId);
         }
 
+        setPhase((byte)(getPhase() + 1));
         if(!getModelRepository().allClassifiersExist()) {
             saveState();
             clearState();
             return;
         }
 
-        setPhase((byte)(getPhase() + 1));
         getClassifier().loadModels();
         matchRemaining(shopId);
 
@@ -129,7 +128,7 @@ public class MatcherService {
         List<ShopOffer> shopOffers = new LinkedList<>();
         ShopOffer offer = null;
         do {
-            offer = getCache().getOffer(shopId, (byte)1);
+            offer = getCache().getUnmatchedOffer(shopId, (byte)1);
             shopOffers.add(offer);
         } while (offer != null);
 
@@ -143,7 +142,7 @@ public class MatcherService {
 
     private void matchSingleByIdentifier(long shopId, ShopOffer offer) {
         for(MatchIdentifierStrategy strategy : getIdentifierStrategies()) {
-            ParsedOffer match = (offer != null)? strategy.match(shopId, offer) : null;
+            ParsedOffer match = (offer != null) ? strategy.match(shopId, offer) : null;
             if(match != null) {
                 if (match.getImageUrl()!= null) {
                     match.setImageId(PictureIdFinder.getImageId(match.getImageUrl(), getPictureIds()));

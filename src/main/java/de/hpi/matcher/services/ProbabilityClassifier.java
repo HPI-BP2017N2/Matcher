@@ -36,8 +36,6 @@ public class ProbabilityClassifier {
 
     private final ModelRepository modelRepository;
 
-    private final ModelGenerator modelGenerator;
-
     private final TokenizerFactory tokenizerFactory = new DefaultTokenizerFactory();
 
     private ParagraphVectors categoryClassifier;
@@ -60,7 +58,6 @@ public class ProbabilityClassifier {
 
 
     public void loadModels() throws Exception {
-        startClassifierGeneration();
         getTokenizerFactory().setTokenPreProcessor(new CommonPreprocessor());
 
         loadCategoryClassifier();
@@ -86,35 +83,16 @@ public class ProbabilityClassifier {
 
     public double getMatchProbability(ShopOffer shopOffer, ParsedOffer parsedOffer) {
         FeatureInstance instance = new FeatureInstance(shopOffer, parsedOffer);
-        double[] classifyingProbabilities = null;
         try {
-            classifyingProbabilities = getModel().distributionForInstance(instance);
+            // first value is match probability, second not-match probability
+            return getModel().distributionForInstance(instance)[0];
         } catch (Exception e) {
             e.printStackTrace();
-        }
-
-        if(classifyingProbabilities != null) {
-            // first value is match probability, second not-match probability
-            return classifyingProbabilities[0];
         }
 
         return 0.0;
     }
 
-
-    private void startClassifierGeneration() {
-        if(!getModelRepository().categoryClassifierExists()) {
-            getModelGenerator().generateCategoryClassifier();
-        }
-
-        if(!getModelRepository().brandClassifierExists()) {
-            getModelGenerator().generateBrandClassifier();
-        }
-
-        if(!getModelRepository().modelExists()) {
-            getModelGenerator().generateModel();
-        }
-    }
 
     private void loadModel() throws Exception {
         ScoredModel model = getModelRepository().getModel();
@@ -126,7 +104,7 @@ public class ProbabilityClassifier {
     }
 
     private void loadBrandClassifier() throws IOException {
-        setBrandClassifier(getModelRepository().getBrandClassifier().getNeuralNetwork());
+        setBrandClassifier(getModelRepository().getBrandClassifier());
         setBrandMeansBuilder(new MeansBuilder(
                 (InMemoryLookupTable<VocabWord>)getBrandClassifier().getLookupTable(),
                 getTokenizerFactory()));
@@ -137,7 +115,7 @@ public class ProbabilityClassifier {
     }
 
     private void loadCategoryClassifier() throws IOException {
-        setCategoryClassifier(getModelRepository().getCategoryClassifier().getNeuralNetwork());
+        setCategoryClassifier(getModelRepository().getCategoryClassifier());
         setCategoryMeansBuilder(new MeansBuilder(
                 (InMemoryLookupTable<VocabWord>)getCategoryClassifier().getLookupTable(),
                 getTokenizerFactory()));
