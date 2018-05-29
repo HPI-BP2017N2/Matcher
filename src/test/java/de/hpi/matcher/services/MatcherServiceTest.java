@@ -66,7 +66,7 @@ public class MatcherServiceTest {
     }
 
     @Test
-    public void matchWithEan(){
+    public void matchWithEan() throws Exception {
         doReturn(true).when(getParsedOfferRepository()).eanFound(getEXAMPLE_SHOP_ID());
         doReturn(false).when(getParsedOfferRepository()).hanFound(getEXAMPLE_SHOP_ID());
         doReturn(getShopOffer(), null, null).when(getCache()).getOffer(getEXAMPLE_SHOP_ID(), getPHASE());
@@ -79,7 +79,7 @@ public class MatcherServiceTest {
     }
 
     @Test
-    public void matchWithHan(){
+    public void matchWithHan() throws Exception {
         doReturn(false).when(getParsedOfferRepository()).eanFound(getEXAMPLE_SHOP_ID());
         doReturn(true).when(getParsedOfferRepository()).hanFound(getEXAMPLE_SHOP_ID());
 
@@ -94,7 +94,7 @@ public class MatcherServiceTest {
     }
 
     @Test
-    public void doNotFindMatch(){
+    public void doNotFindMatch() throws Exception {
         doReturn(true).when(getParsedOfferRepository()).eanFound(getEXAMPLE_SHOP_ID());
         doReturn(true).when(getParsedOfferRepository()).hanFound(getEXAMPLE_SHOP_ID());
 
@@ -111,7 +111,7 @@ public class MatcherServiceTest {
     }
 
     @Test
-    public void doNotGetShopOffer(){
+    public void doNotGetShopOffer() throws Exception {
         doReturn(true).when(getParsedOfferRepository()).eanFound(getEXAMPLE_SHOP_ID());
         doReturn(true).when(getParsedOfferRepository()).hanFound(getEXAMPLE_SHOP_ID());
 
@@ -125,7 +125,7 @@ public class MatcherServiceTest {
     }
 
     @Test
-    public void doNotMatchIdentifiers() {
+    public void doNotMatchIdentifiers() throws Exception {
         doReturn(false).when(getParsedOfferRepository()).eanFound(getEXAMPLE_SHOP_ID());
         doReturn(false).when(getParsedOfferRepository()).hanFound(getEXAMPLE_SHOP_ID());
 

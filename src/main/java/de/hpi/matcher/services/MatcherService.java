@@ -62,6 +62,9 @@ public class MatcherService {
     }
 
     public void matchShop(long shopId, byte phase) throws Exception {
+        if(getParsedOfferRepository().collectionIsEmpty(shopId)) {
+            return;
+        }
         setupState(shopId, phase);
         getCache().warmup(shopId);
         setStrategies(shopId);

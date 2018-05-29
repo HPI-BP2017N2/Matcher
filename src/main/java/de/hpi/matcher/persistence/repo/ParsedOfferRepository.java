@@ -63,4 +63,8 @@ public class ParsedOfferRepository {
                 getMongoTemplate().findOne(query(where(identifier).is(value)), ParsedOffer.class, Long.toString(shopId))
                 : null;
     }
+
+    public boolean collectionIsEmpty(long shopId) {
+        return  getMongoTemplate().count(query(where("_id").exists(true)), ParsedOffer.class, Long.toString(shopId)) == 0;
+    }
 }
