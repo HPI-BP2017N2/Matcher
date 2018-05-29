@@ -11,6 +11,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.nd4j.linalg.primitives.Pair;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +23,7 @@ import java.util.*;
 @Getter(AccessLevel.PRIVATE)
 @Setter(AccessLevel.PRIVATE)
 @RequiredArgsConstructor
+@Slf4j
 public class MatcherService {
 
     private final Cache cache;
@@ -57,6 +59,7 @@ public class MatcherService {
     @PreDestroy
     public void saveState() {
         if(getShopId() != 0) {
+            log.info("Interrupt matching for shop {} during phase {} at {} ", getShopId(), getPhase(), new Date());
             getMatcherStateRepository().saveState(getShopId(), getPhase());
         }
     }
@@ -65,27 +68,36 @@ public class MatcherService {
         if(getParsedOfferRepository().collectionIsEmpty(shopId)) {
             return;
         }
+
+        log.info("(Re-)Start matching shop {} inf phase {} at {}", shopId, phase, new Date());
+
         setupState(shopId, phase);
         getCache().warmup(shopId);
         setStrategies(shopId);
         setImageIds(shopId);
 
         if(!getIdentifierStrategies().isEmpty() && phase == (byte) 0){
+            log.info("Start matching unique identifiers for shop {} at {}", shopId, new Date());
             matchAllByIdentifier(shopId);
+            log.info("Finished matching unique identifiers for shop {} at {}", shopId, new Date());
         }
 
         setPhase((byte)(getPhase() + 1));
         if(!getModelRepository().allClassifiersExist()) {
             saveState();
             clearState();
+            log.info("Stopped matching shop {} at {} since there are no classifiers.", shopId, new Date());
             return;
         }
 
         getClassifier().loadModels();
-        matchRemaining(shopId);
 
+        log.info("Start matching offers with classifier for shop {} at {}", shopId, new Date());
+        matchRemaining(shopId);
+        log.info("Finished matching offers with classifier for shop {} at {}", shopId, new Date());
 
         clearState();
+        log.info("Finished matching shop {} at {}", shopId, new Date());
     }
 
     private void setImageIds(long shopId) {
