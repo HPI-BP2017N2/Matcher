@@ -58,9 +58,3 @@ cache:
  updatePhaseRoute: "/updatePhase/"
  deleteAllRoute: "/deleteAll/"
  warmupRoute: "/warmup/"
-
-modelgenerator:
- uri: ${MLMG_IP}
- modelRoute: "/generateModel"
- categoryClassifierRoute: "/generateCategoryClassifier"
- brandClassifierRoute: "/generateBrandClassifier"

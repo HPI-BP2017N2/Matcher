@@ -203,7 +203,6 @@ public class MatcherService {
         }
 
         return null;
-
     }
 
     private void saveResult(ShopOffer offer,
@@ -221,41 +220,11 @@ public class MatcherService {
                 match);
 
         getMatchingResultRepository().save(offer.getShopId(), result);
-
     }
 
     private void deleteShopOfferAndParsedOffer(long shopId, ShopOffer shopOffer, ParsedOffer parsedOffer) {
         getCache().deleteOffer(shopId, shopOffer.getOfferKey());
         getParsedOfferRepository().deleteParsedOffer(shopId, parsedOffer.getUrl());
-
-    }
-
-    public void classify() {
-        ShopOffer shopOffer = new ShopOffer();
-        ParsedOffer parsedOffer = new ParsedOffer();
-        Map<String, String> title = new HashMap<>();
-        title.put("0", "iPhone6");
-        shopOffer.setTitles(title);
-        parsedOffer.setTitle("iPhone7");
-        shopOffer.setDescriptions(title);
-        parsedOffer.setBrandName("Appe");
-        shopOffer.setBrandName("Apple");
-        parsedOffer.setPrice("1000");
-        Map<String, Double> price = new HashMap<>();
-        price.put("0", 1000d);
-        shopOffer.setPrices(price);
-        shopOffer.setMappedCatalogCategory("12345");
-        parsedOffer.setCategory("12345");
-        Map<String, String> url = new HashMap<>();
-        url.put("0", "http://example.com/123");
-        shopOffer.setUrls(url);
-        parsedOffer.setUrl("http://example.com/123");
-        shopOffer.setImageId("qwerty");
-        parsedOffer.setImageUrl( "qwerty");
-        parsedOffer.setSku("abc");
-        shopOffer.setSku("abc");
-
-        System.out.println(getClassifier().getMatchProbability(shopOffer, parsedOffer));
     }
 
 }
