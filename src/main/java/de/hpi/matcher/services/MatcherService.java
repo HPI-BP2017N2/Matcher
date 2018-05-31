@@ -172,11 +172,10 @@ public class MatcherService {
 
         for(int i = 0; i < parsedOffers.size(); i++) {
             ParsedOffer parsedOffer = parsedOffers.get(i);
-            parsedOffer.setBrandName(getBrand(parsedOffer.getTitle()));
             parsedOffer.setCategory(getCategory(parsedOffer.getTitle()));
 
             for(int j = 0; j < shopOffers.size(); j++) {
-                scoreMatrix[i][j] = getClassifier().getMatchProbability(shopOffers.get(j), parsedOffer);
+                scoreMatrix[i][j] = getClassifier().getMatchProbability(shopOffers.get(j), parsedOffer, getBrand(parsedOffer.getTitle()));
             }
         }
 

@@ -33,18 +33,6 @@ public class ModelRepository {
     @Autowired
     private final RetryProperties retryProperties;
 
-    public boolean categoryClassifierExists() {
-        return classifierExists("category");
-    }
-
-    public boolean brandClassifierExists() {
-        return classifierExists("brand");
-    }
-
-    public boolean modelExists() {
-        return getMongoTemplate().exists(query(where("_id").exists(true)), ScoredModel.class);
-    }
-
     public boolean allClassifiersExist() {
         return categoryClassifierExists() && brandClassifierExists() && modelExists();
     }
@@ -62,11 +50,22 @@ public class ModelRepository {
     }
 
     private boolean classifierExists(String id) {
-        return getMongoTemplate().findById(id, SerializedParagraphVectors.class) != null;
+        return getMongoTemplate().exists(query(where("_id").is(id)), SerializedParagraphVectors.class);
     }
 
     private ParagraphVectors getNeuralNetworkById(String id) throws IOException {
         return getMongoTemplate().findById(id, SerializedParagraphVectors.class).getNeuralNetwork();
+    }
 
+    private boolean categoryClassifierExists() {
+        return classifierExists("category");
+    }
+
+    private boolean brandClassifierExists() {
+        return classifierExists("brand");
+    }
+
+    private boolean modelExists() {
+        return getMongoTemplate().exists(query(where("_id").exists(true)), ScoredModel.class);
     }
 }

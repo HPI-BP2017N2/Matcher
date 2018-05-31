@@ -70,10 +70,10 @@ public class ProbabilityClassifier {
         return getBestScoredLabel(scores);
     }
 
-    public double getMatchProbability(ShopOffer shopOffer, ParsedOffer parsedOffer) {
-        FeatureInstance instance = new FeatureInstance(shopOffer, parsedOffer);
+    public double getMatchProbability(ShopOffer shopOffer, ParsedOffer parsedOffer, String classifiedBrand) {
+        FeatureInstance instance = new FeatureInstance(shopOffer, parsedOffer, classifiedBrand);
         try {
-            // first value is match probability, second not-match probability
+            // first value of double[] is match probability, second not-match probability
             return getModel().distributionForInstance(instance)[0];
         } catch (Exception e) {
             e.printStackTrace();
