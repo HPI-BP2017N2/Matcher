@@ -32,7 +32,7 @@ import java.util.List;
 @Setter(AccessLevel.PRIVATE)
 @RequiredArgsConstructor
 @Slf4j
-public class ProbabilityClassifier {
+class ProbabilityClassifier {
 
     private final ModelRepository modelRepository;
     private final TokenizerFactory tokenizerFactory = new DefaultTokenizerFactory();
@@ -46,7 +46,7 @@ public class ProbabilityClassifier {
     private LabelSeeker brandLabelSeeker;
 
 
-    public void loadModels() throws Exception {
+    void loadModels() throws Exception {
         getTokenizerFactory().setTokenPreProcessor(new CommonPreprocessor());
 
         loadCategoryClassifier();
@@ -54,7 +54,7 @@ public class ProbabilityClassifier {
         loadModel();
     }
 
-    public Pair<String, Double> getBrand(String offerTitle) {
+    Pair<String, Double> getBrand(String offerTitle) {
         LabelledDocument document = getLabelledDocumentFromTitle(offerTitle);
         INDArray documentAsCentroid = getBrandMeansBuilder().documentAsVector(document);
         List<Pair<String, Double>> scores = getBrandLabelSeeker().getScores(documentAsCentroid);
@@ -62,7 +62,7 @@ public class ProbabilityClassifier {
         return getBestScoredLabel(scores);
     }
 
-    public Pair<String, Double> getCategory(String offerTitle) {
+    Pair<String, Double> getCategory(String offerTitle) {
         LabelledDocument document = getLabelledDocumentFromTitle(offerTitle);
         INDArray documentAsCentroid = getCategoryMeansBuilder().documentAsVector(document);
         List<Pair<String, Double>> scores = getCategoryLabelSeeker().getScores(documentAsCentroid);
@@ -70,7 +70,7 @@ public class ProbabilityClassifier {
         return getBestScoredLabel(scores);
     }
 
-    public double getMatchProbability(ShopOffer shopOffer, ParsedOffer parsedOffer, String classifiedBrand) {
+    double getMatchProbability(ShopOffer shopOffer, ParsedOffer parsedOffer, String classifiedBrand) {
         FeatureInstance instance = new FeatureInstance(shopOffer, parsedOffer, classifiedBrand);
         try {
             // first value of double[] is match probability, second not-match probability

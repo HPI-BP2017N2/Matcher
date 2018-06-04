@@ -18,6 +18,10 @@ public class RabbitReceiver {
 
     private final MatcherService matcherService;
 
+    /**
+     * This message starts matching one shop when receiving shop from queue.
+     * @param request Message from crawler containing the shop ID
+     */
     @RabbitListener(queues = "#{@matcherQueue}")
     public void onMessage(FinishedShop request) {
         log.debug("Got an {}", request);

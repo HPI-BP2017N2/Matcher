@@ -40,6 +40,10 @@ public class MatcherService {
     private List<MatchIdentifierStrategy> identifierStrategies = new ArrayList<>();
     private List<State> remainingStates = new ArrayList<>();
 
+    /**
+     * This method gets all shops that were interrupted during matching and continues matching them.
+     * @throws Exception
+     */
     @PostConstruct
     public void restartInterruptedMatching() throws Exception {
         List<State> states;
@@ -57,6 +61,9 @@ public class MatcherService {
         }
     }
 
+    /**
+     * This method saves all shops that were not completely matched yet.
+     */
     @PreDestroy
     public void saveStates() {
         if(getShopId() != 0) {
@@ -66,6 +73,15 @@ public class MatcherService {
         getMatcherStateRepository().saveAllStates(getRemainingStates());
     }
 
+    /**
+     * This method matches all parsed offers in database with their corresponding offers already known by idealo.<br />
+     * In phase 0, "safe" matches (EAN or HAN + brand) are found.
+     * Phase 1 will use a machine learning classifier to determine the matches.<br />
+     * If there are no classifiers stored in the database, the shop ID will be saved for matching later on.
+     * @param shopId The ID of the shop
+     * @param phase The phase to start in
+     * @throws Exception when the machine learning classifiers cannot be loaded
+     */
     public void matchShop(long shopId, byte phase) throws Exception {
         if(getParsedOfferRepository().collectionIsEmpty(shopId)) {
             return;
