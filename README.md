@@ -8,7 +8,7 @@ It is written in Java and uses the Spring framework. It has no REST interface.
  The matcher requests idealo's offers for specific shops from [the cache](https://github.com/HPI-BP2017N2/Cache).
 2. MongoDB  
  The matcher uses several MongoDB databases for storing and retrieving various information.  
- 2.1. One database is used for reading the information extracted by [the parser](https://github.com/HPI-BP2017N2/Parser). It is expected that those information is separated into multiple collections (one for every shop, named by the corresponding shop ID).
+ 2.1. One database is used for reading the information extracted by [the parser](https://github.com/HPI-BP2017N2/Parser). It is expected that those information is separated into multiple collections (one for every shop, named by the corresponding shop ID).  
  2.2. One database is used for saving the results of the matching process. Those data can be used for further visualization or processing. [The model generator](https://github.com/HPI-BP2017N2/MachineLearningModelGenerator) can use some of this data for training various classifiers. The collection structure is similar to the parsed offers.  
  2.3. One database is used for storing and reading the state of the matcher. When restarted, the matcher will continue matching the shops stored there.  
 2.4. One database is used for reading the different classifiers used during the matching process. It is expected to have two collections.   
