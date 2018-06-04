@@ -33,7 +33,7 @@ public class Cache {
     public void warmup(long shopId) {
         getRestTemplate().getForObject(warmupURI(shopId), Object.class);
     }
-
+    
 
     @Retryable(
             value = {HttpClientErrorException.class },

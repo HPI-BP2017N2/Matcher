@@ -138,6 +138,7 @@
             <artifactId>weka-stable</artifactId>
             <version>3.8.2</version>
         </dependency>
+
     </dependencies>
 
     <build>
