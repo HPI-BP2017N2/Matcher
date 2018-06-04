@@ -42,7 +42,7 @@ public class MatcherService {
 
     /**
      * This method gets all shops that were interrupted during matching and continues matching them.
-     * @throws Exception
+     * @throws Exception when the machine learning classifiers cannot be deserialized
      */
     @PostConstruct
     public void restartInterruptedMatching() throws Exception {
@@ -80,7 +80,7 @@ public class MatcherService {
      * If there are no classifiers stored in the database, the shop ID will be saved for matching later on.
      * @param shopId The ID of the shop
      * @param phase The phase to start in
-     * @throws Exception when the machine learning classifiers cannot be loaded
+     * @throws Exception when the machine learning classifiers cannot be deserialized
      */
     public void matchShop(long shopId, byte phase) throws Exception {
         if(getParsedOfferRepository().collectionIsEmpty(shopId)) {
@@ -159,7 +159,6 @@ public class MatcherService {
             offer = getCache().getOffer(shopId, (byte)0);
             matchSingleByIdentifier(shopId, offer);
         } while (offer != null);
-
     }
 
     private void matchRemaining(long shopId) {
