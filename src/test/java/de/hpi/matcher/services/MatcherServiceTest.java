@@ -67,7 +67,7 @@ public class MatcherServiceTest {
         getParsedOffers().add(getParsedOffer());
 
         doNothing().when(getMatchingResultRepository()).save(anyLong(), any(MatchingResult.class));
-        doNothing().when(getMatcherStateRepository()).saveState(anyLong(), anyByte());
+        doNothing().when(getMatcherStateRepository()).saveState(anyLong(), anyByte(), anyList());
 
         setService(new MatcherService(
                 getCache(),
@@ -174,7 +174,7 @@ public class MatcherServiceTest {
 
         verify(getCache(), never()).getOffer(anyLong(), anyByte());
         verify(getCache(), never()).getUnmatchedOffer(anyLong(), anyByte());
-        verify(getMatcherStateRepository(), times(0)).saveState(getEXAMPLE_SHOP_ID(), (byte) (getPHASE() + 1));
+        verify(getMatcherStateRepository(), times(0)).saveState(eq(getEXAMPLE_SHOP_ID()), eq((byte) (getPHASE() + 1)), anyList());
 
     }
 
@@ -187,7 +187,7 @@ public class MatcherServiceTest {
 
         verify(getCache(), never()).getUnmatchedOffer(anyLong(), anyByte());
         verify(getClassifier(), never()).loadModels();
-        verify(getMatcherStateRepository()).saveState(getEXAMPLE_SHOP_ID(), (byte) (getPHASE() + 1));
+        verify(getMatcherStateRepository()).saveState(eq(getEXAMPLE_SHOP_ID()), eq((byte) (getPHASE() + 1)), anyList());
     }
 
     @Test
