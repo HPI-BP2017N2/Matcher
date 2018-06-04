@@ -40,4 +40,4 @@ It is written in Java and uses the Spring framework. It has no REST interface.
 3. Matcher requests every idealo offer and searches for a save match (EAN or combination of HAN and brand can be found in parsed offers). Those matches are being stored.
 4. Matcher loads classifiers from database. If there are no classifiers, matcher will save the current shop ID th the state database and abort the matching process.
 5. Matcher classifies match probabilities for every combination of remaining parsed offers and shop offers. Features are equality of SKU, HAN, URL, brand, classified brand,  category and image ID, text similarities for title and description, percentaged deviance of price.
-6. The highest scored matches with a probability above the specified threshold are stored as matches, the remaining as newly discovered ones.
+6. The highest scored matches with a probability above the specified threshold are stored as matches, the remaining shop offers as newly discovered ones.
