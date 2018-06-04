@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 import static org.springframework.data.mongodb.core.query.Query.query;
 
@@ -19,17 +21,16 @@ public class MatcherStateRepository {
     @Qualifier(value = "stateTemplate")
     private MongoTemplate mongoTemplate;
 
-    public void saveState(long shopId, byte phase) {
-        getMongoTemplate().insert(new State(shopId, phase));
-
+    public List<State> popAllStates() {
+        return getMongoTemplate().findAllAndRemove(query(where("_id").exists(true)), State.class);
     }
 
-    public State popState() {
-        State state = getMongoTemplate().findOne(query(where("shopId").exists(true)), State.class);
-        if(state != null) {
-            getMongoTemplate().remove(state);
-        }
-        return state;
+    public void saveState(long shopId, byte phase, List<Integer> imageIds) {
+        getMongoTemplate().insert(new State(shopId, phase, imageIds));
+    }
+
+    public void saveAllStates(List<State> states) {
+        getMongoTemplate().insertAll(states);
     }
 
 }

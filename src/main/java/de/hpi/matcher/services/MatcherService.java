@@ -38,30 +38,32 @@ public class MatcherService {
     private long shopId = 0;
     private List<Integer> pictureIds;
     private List<MatchIdentifierStrategy> identifierStrategies = new ArrayList<>();
-    private List<Integer> imageUrlIdPosition = new ArrayList<>();
+    private List<State> remainingStates = new ArrayList<>();
 
     @PostConstruct
     public void restartInterruptedMatching() throws Exception {
-        State state = null;
-        do {
-            state = getMatcherStateRepository().popState();
-            if (state != null) {
+        List<State> states;
+        states = getMatcherStateRepository().popAllStates();
+        if (states != null) {
+            setRemainingStates(states);
+            for(State state : getRemainingStates()) {
                 if (state.getPhase() == (byte) 1) {
                     getCache().updatePhase(state.getShopId(), (byte) (state.getPhase() + 1), state.getPhase());
                 }
 
-                matchShop(state.getShopId(), state.getPhase());
+                matchShop(state.getShopId(), state.getPhase(), state.getImageIds());
+                getRemainingStates().remove(state);
             }
-
-        } while (state != null );
+        }
     }
 
     @PreDestroy
-    public void saveState() {
+    public void saveStates() {
         if(getShopId() != 0) {
             log.info("Interrupt matching for shop {} during phase {} at {} ", getShopId(), getPhase(), new Date());
-            getMatcherStateRepository().saveState(getShopId(), getPhase());
+            getRemainingStates().add(new State(getShopId(), getPhase(), getPictureIds()));
         }
+        getMatcherStateRepository().saveAllStates(getRemainingStates());
     }
 
     public void matchShop(long shopId, byte phase) throws Exception {
@@ -69,7 +71,7 @@ public class MatcherService {
             return;
         }
 
-        log.info("(Re-)Start matching shop {} inf phase {} at {}", shopId, phase, new Date());
+        log.info("(Re-)Start matching shop {} in phase {} at {}", shopId, phase, new Date());
 
         setupState(shopId, phase);
         getCache().warmup(shopId);
@@ -84,7 +86,7 @@ public class MatcherService {
 
         setPhase((byte)(getPhase() + 1));
         if(!getModelRepository().allClassifiersExist()) {
-            saveState();
+            getMatcherStateRepository().saveState(shopId, getPhase(), getPictureIds());
             clearState();
             log.info("Stopped matching shop {} at {} since there are no classifiers.", shopId, new Date());
             return;
@@ -100,9 +102,16 @@ public class MatcherService {
         log.info("Finished matching shop {} at {}", shopId, new Date());
     }
 
+    private void matchShop(long shopId, byte phase, List<Integer> imageIds) throws Exception {
+        setPictureIds(imageIds);
+        matchShop(shopId, phase);
+    }
+
     private void setImageIds(long shopId) {
-        List<ParsedOffer> offers = getParsedOfferRepository().getOffersWithImageUrl(shopId, 50);
-        setPictureIds(PictureIdFinder.findPictureId(offers));
+        if (getPictureIds() == null || getPictureIds().size() == 0) {
+            List<ParsedOffer> offers = getParsedOfferRepository().getOffersWithImageUrl(shopId, 50);
+            setPictureIds(PictureIdFinder.findPictureId(offers));
+        }
     }
 
     private void setStrategies(long shopId) {
@@ -119,6 +128,7 @@ public class MatcherService {
     private void clearState() {
         setShopId(0);
         setPhase((byte)0);
+        setPictureIds(null);
     }
 
     private void setupState(long shopId, byte phase) {
@@ -128,8 +138,7 @@ public class MatcherService {
 
     private void matchAllByIdentifier(long shopId) {
         ShopOffer offer;
-        List<ParsedOffer> parsedOffers = getParsedOfferRepository().getOffers(shopId, 100);
-        setImageUrlIdPosition(PictureIdFinder.findPictureId(parsedOffers));
+
         do {
             offer = getCache().getOffer(shopId, (byte)0);
             matchSingleByIdentifier(shopId, offer);
@@ -139,7 +148,7 @@ public class MatcherService {
 
     private void matchRemaining(long shopId) {
         List<ShopOffer> shopOffers = new LinkedList<>();
-        ShopOffer offer = null;
+        ShopOffer offer;
         do {
             offer = getCache().getUnmatchedOffer(shopId, (byte)1);
             shopOffers.add(offer);

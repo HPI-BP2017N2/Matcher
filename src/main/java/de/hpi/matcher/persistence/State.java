@@ -1,19 +1,17 @@
 package de.hpi.matcher.persistence;
 
 import lombok.Getter;
-import lombok.Setter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.annotation.Id;
 
+import java.util.List;
+
 @Getter
-@Setter
+@RequiredArgsConstructor
 public class State {
 
-    @Id private long shopId;
-    private byte phase;
-
-    public State(long shopId, byte phase) {
-        setPhase(phase);
-        setShopId(shopId);
-    }
+    @Id private final long shopId;
+    private final byte phase;
+    private final List<Integer> imageIds;
 
 }
