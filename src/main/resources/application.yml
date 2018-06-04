@@ -1,14 +1,9 @@
 server:
   port: ${MATCHER_PORT}
 
-matcher:
+matcher-settings:
   labelThreshold: 0.5
   matchingThreshold: 0.5
-
-retry:
-  modelGeneratingBaseRetry: 20000
-  modelGeneratingRetryMultiplier: 3
-  modelGeneratingMaxAttempts: 7
 
 spring:
  rabbitmq:
@@ -16,7 +11,7 @@ spring:
   port: ${RABBIT_PORT}
   username: ${RABBIT_USER}
   password: ${RABBIT_PW}
-  queueName: ${RABBIT_QUEUE_NAME}
+  queueName: "testDoneMessages"
 
 parsed-offers:
  mongodb:

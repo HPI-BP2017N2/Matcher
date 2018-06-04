@@ -2,7 +2,6 @@ package de.hpi.matcher.persistence.repo;
 
 import de.hpi.machinelearning.persistence.ScoredModel;
 import de.hpi.machinelearning.persistence.SerializedParagraphVectors;
-import de.hpi.matcher.properties.RetryProperties;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +9,6 @@ import org.deeplearning4j.models.paragraphvectors.ParagraphVectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
@@ -29,9 +27,6 @@ public class ModelRepository {
     @Autowired
     @Qualifier(value = "modelTemplate")
     private final MongoTemplate mongoTemplate;
-
-    @Autowired
-    private final RetryProperties retryProperties;
 
     public boolean allClassifiersExist() {
         return categoryClassifierExists() && brandClassifierExists() && modelExists();
