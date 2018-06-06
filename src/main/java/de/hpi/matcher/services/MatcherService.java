@@ -46,7 +46,7 @@ public class MatcherService {
      */
     @PostConstruct
     public void restartInterruptedMatching() throws Exception {
-        List<State> states;
+        /*List<State> states;
         states = getMatcherStateRepository().popAllStates();
         if (states != null) {
             setRemainingStates(states);
@@ -58,7 +58,7 @@ public class MatcherService {
                 matchShop(state.getShopId(), state.getPhase(), state.getImageIds());
                 getRemainingStates().remove(state);
             }
-        }
+        }*/
     }
 
     /**
@@ -159,6 +159,8 @@ public class MatcherService {
             offer = getCache().getOffer(shopId, (byte)0);
             matchSingleByIdentifier(shopId, offer);
         } while (offer != null);
+
+        saveNewEanOffers(shopId);
     }
 
     private void matchRemaining(long shopId) {
@@ -184,10 +186,19 @@ public class MatcherService {
                 if (match.getImageUrl()!= null) {
                     match.setImageId(PictureIdFinder.getImageId(match.getImageUrl(), getPictureIds()));
                 }
-                saveResult(offer, match, strategy.getMatchingReason());
+                saveMatch(offer, match, strategy.getMatchingReason(), 100);
                 deleteShopOfferAndParsedOffer(shopId, offer, match);
                 return;
             }
+        }
+    }
+
+    private void saveNewEanOffers(long shopId) {
+        List<ParsedOffer> offersWithEan = getParsedOfferRepository().getOffersWithEan(shopId);
+
+        for(ParsedOffer offer : offersWithEan) {
+            saveNewOffer(shopId, offer);
+            getParsedOfferRepository().deleteParsedOffer(shopId, offer.getUrl());
         }
     }
 
@@ -228,13 +239,14 @@ public class MatcherService {
         return null;
     }
 
-    private void saveResult(ShopOffer offer,
-                            ParsedOffer match,
-                            String matchingReason) {
+    private void saveMatch(ShopOffer offer,
+                           ParsedOffer match,
+                           String matchingReason,
+                           int confidence) {
         MatchingResult result = new MatchingResult(
                 offer.getShopId(),
                 matchingReason,
-                100,
+                confidence,
                 offer.getOfferKey(),
                 offer.getMappedCatalogCategory(),
                 offer.getCategoryName(),
@@ -243,6 +255,10 @@ public class MatcherService {
                 match);
 
         getMatchingResultRepository().save(offer.getShopId(), result);
+    }
+
+    private void saveNewOffer(long shopId, ParsedOffer offer) {
+        getMatchingResultRepository().save(shopId, new MatchingResult(shopId, offer));
     }
 
     private void deleteShopOfferAndParsedOffer(long shopId, ShopOffer shopOffer, ParsedOffer parsedOffer) {

@@ -45,17 +45,16 @@ public class ParsedOfferRepository {
         getMongoTemplate().remove(query(where("_id").is(url)), Long.toString(shopId));
     }
 
-    public List<ParsedOffer> getOffers(long shopId, int count) {
-        return getMongoTemplate().find(query(where("_id").exists(true)).limit(count), ParsedOffer.class, Long.toString(shopId));
-    }
-
     public List<ParsedOffer> getAllOffers(long shopId) {
         return getMongoTemplate().findAll(ParsedOffer.class, Long.toString(shopId));
-
     }
 
     public List<ParsedOffer> getOffersWithImageUrl(long shopId, int count) {
-        return getMongoTemplate().find(query(where("imageUrl").exists(true)).limit(count), ParsedOffer.class, Long.toString(shopId));
+        return getMongoTemplate().find(query(where("imageUrl").ne("")).limit(count), ParsedOffer.class, Long.toString(shopId));
+    }
+
+    public List<ParsedOffer> getOffersWithEan(long shopId) {
+        return getMongoTemplate().find(query(where("ean").ne("")), ParsedOffer.class, Long.toString(shopId));
     }
 
     private ParsedOffer getByIdentifier(long shopId, String identifier, String value) {
