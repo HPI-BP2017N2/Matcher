@@ -54,7 +54,7 @@ public class ParsedOfferRepository {
     }
 
     public List<ParsedOffer> getOffersWithEan(long shopId) {
-        return getMongoTemplate().find(query(where("ean").ne("")), ParsedOffer.class, Long.toString(shopId));
+        return getMongoTemplate().find(query(where("ean").ne("").and("ean").ne(null)), ParsedOffer.class, Long.toString(shopId));
     }
 
     private ParsedOffer getByIdentifier(long shopId, String identifier, String value) {

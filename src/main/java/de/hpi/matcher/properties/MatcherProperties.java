@@ -17,5 +17,6 @@ public class MatcherProperties {
 
     private double labelThreshold;
     private double matchingThreshold;
+    private boolean collectTrainingData;
 
 }

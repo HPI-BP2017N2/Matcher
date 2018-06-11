@@ -1,6 +1,6 @@
 # Matcher [![Build Status](https://travis-ci.org/HPI-BP2017N2/Matcher.svg?branch=master)](https://travis-ci.org/HPI-BP2017N2/Matcher)
 The matcher is a microservice component, which finds counterparts of parsed offers in the idealo offer database.
-It is written in Java and uses the Spring framework. It has no REST interface.
+It is written in Java and uses the Spring framework.
 
 ## Getting started
 ### Prerequisites
@@ -33,6 +33,7 @@ It is written in Java and uses the Spring framework. It has no REST interface.
 #### Component properties
 - labelThreshold: The minimum probability to classify the category and the brand of a parsed offer
 - matchingThreshold: The minimum probability of a match to decide whether two offers are equivalent or not
+- collectTrainingData: If set to true, the matcher will accept POST requests to match shops via unique identifiers and does not read from the queue.
 
 ## How it works
 1. Matcher gets a message to start matching one specific shop or reads a state from the database.

@@ -4,6 +4,7 @@ server:
 matcher-settings:
   labelThreshold: 0.5
   matchingThreshold: 0.5
+  collectTrainingData: true
 
 spring:
  rabbitmq:

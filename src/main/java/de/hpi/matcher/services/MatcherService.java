@@ -46,7 +46,11 @@ public class MatcherService {
      */
     @PostConstruct
     public void restartInterruptedMatching() throws Exception {
-        /*List<State> states;
+        if(getProperties().isCollectTrainingData()) {
+            return;
+        }
+        
+        List<State> states;
         states = getMatcherStateRepository().popAllStates();
         if (states != null) {
             setRemainingStates(states);
@@ -58,7 +62,7 @@ public class MatcherService {
                 matchShop(state.getShopId(), state.getPhase(), state.getImageIds());
                 getRemainingStates().remove(state);
             }
-        }*/
+        }
     }
 
     /**
