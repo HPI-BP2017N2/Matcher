@@ -4,6 +4,9 @@ import de.hpi.matcher.dto.ErrorResponse;
 import de.hpi.matcher.dto.SuccessResponse;
 import de.hpi.matcher.properties.MatcherProperties;
 import de.hpi.matcher.services.MatcherService;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +26,12 @@ public class Controller {
     private final MatcherService service;
     private final MatcherProperties properties;
 
-    @RequestMapping(value = "/match/{shopId}", method = RequestMethod.GET)
+
+    @ApiOperation(value = "Match parsed offers of shop with unique identifiers", response = String.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully matched shop."),
+            @ApiResponse(code = 403, message = "REST interface was disabled for matching from queue.")})
+    @RequestMapping(value = "/matchUnique/{shopId}", method = RequestMethod.POST)
     public ResponseEntity<Object> generateCategoryClassifier(@PathVariable long shopId) throws Exception {
         if(getProperties().isCollectTrainingData()) {
             getService().matchShop(shopId, (byte) 0);

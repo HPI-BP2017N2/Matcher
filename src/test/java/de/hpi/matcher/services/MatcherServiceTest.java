@@ -195,12 +195,14 @@ public class MatcherServiceTest {
         doReturn(false).when(getParsedOfferRepository()).collectionIsEmpty(anyLong());
         doReturn(true).when(getModelRepository()).allClassifiersExist();
         doReturn(getParsedOffers()).when(getParsedOfferRepository()).getAllOffers(anyLong());
+        doReturn(getShopOffer(), null).when(getCache()).getUnmatchedOffer(getEXAMPLE_SHOP_ID(), (byte)1);
         doReturn(getBrandPair()).when(getClassifier()).getBrand(anyString());
         doReturn(getCategoryPair()).when(getClassifier()).getCategory(anyString());
 
         getService().matchShop(getEXAMPLE_SHOP_ID(), getPHASE());
 
-        verify(getCache(), times(getParsedOffers().size())).getUnmatchedOffer(anyLong(), anyByte());
+        verify(getCache(), times(getParsedOffers().size() + 1)).getUnmatchedOffer(anyLong(), anyByte());
+        verify(getMatchingResultRepository(), times(getParsedOffers().size())).save(eq(getEXAMPLE_SHOP_ID()), any(MatchingResult.class));
         verify(getClassifier()).getBrand(anyString());
         verify(getClassifier()).getCategory(anyString());
     }

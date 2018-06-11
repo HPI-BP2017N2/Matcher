@@ -55,13 +55,4 @@ public class MatchEanStrategyTest {
 
     }
 
-    @Test
-    public void matchDirtyEan(){
-        doReturn(null).when(getRepository()).getByEan(getEXAMPLE_SHOP_ID(), getEXAMPLE_EAN());
-        doReturn(getParsedOffer()).when(getRepository()).getByEanWithVariation(getEXAMPLE_SHOP_ID(), getEXAMPLE_EAN());
-
-        assertEquals(getParsedOffer(), getStrategy().match(getEXAMPLE_SHOP_ID(), getShopOffer()));
-        verify(getRepository()).getByEan(getEXAMPLE_SHOP_ID(), getEXAMPLE_EAN());
-        verify(getRepository()).getByEanWithVariation(getEXAMPLE_SHOP_ID(), getEXAMPLE_EAN());
-    }
 }

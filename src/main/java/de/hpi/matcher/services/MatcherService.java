@@ -1,5 +1,6 @@
 package de.hpi.matcher.services;
 
+import de.hpi.machinelearning.HungarianAlgorithm;
 import de.hpi.machinelearning.PictureIdFinder;
 import de.hpi.matcher.dto.ShopOffer;
 import de.hpi.matcher.persistence.MatchingResult;
@@ -26,6 +27,7 @@ import java.util.*;
 @Slf4j
 public class MatcherService {
 
+    public static final String MAX = "max";
     private final Cache cache;
     private final MatcherStateRepository matcherStateRepository;
     private final ParsedOfferRepository parsedOfferRepository;
@@ -49,7 +51,7 @@ public class MatcherService {
         if(getProperties().isCollectTrainingData()) {
             return;
         }
-        
+
         List<State> states;
         states = getMatcherStateRepository().popAllStates();
         if (states != null) {
@@ -172,7 +174,9 @@ public class MatcherService {
         ShopOffer offer;
         do {
             offer = getCache().getUnmatchedOffer(shopId, (byte)1);
-            shopOffers.add(offer);
+            if(offer != null) {
+                shopOffers.add(offer);
+            }
         } while (offer != null);
 
         List<ParsedOffer> parsedOffers = getParsedOfferRepository().getAllOffers(shopId);
@@ -214,7 +218,11 @@ public class MatcherService {
             parsedOffer.setCategory(getCategory(parsedOffer.getTitle()));
 
             for(int j = 0; j < shopOffers.size(); j++) {
-                scoreMatrix[i][j] = getClassifier().getMatchProbability(shopOffers.get(j), parsedOffer, getBrand(parsedOffer.getTitle()));
+                double probability = getClassifier().getMatchProbability(shopOffers.get(j), parsedOffer, getBrand(parsedOffer.getTitle()));
+                if(probability < getProperties().getMatchingThreshold()) {
+                    probability = 0.0;
+                }
+                scoreMatrix[i][j] = probability;
             }
         }
 
@@ -222,7 +230,18 @@ public class MatcherService {
     }
 
     private void findAndSaveBestMatches(double[][] matchScores, List<ShopOffer> shopOffers, List<ParsedOffer> parsedOffers) {
+        int[][] matchIndices = HungarianAlgorithm.hgAlgorithm(matchScores, MAX);
 
+        for(int[] indices : matchIndices) {
+            double currentScore = matchScores[indices[0]][indices[1]];
+            ParsedOffer parsedOffer = parsedOffers.get(indices[0]);
+            if(currentScore != 0) {
+                ShopOffer shopOffer = shopOffers.get(indices[1]);
+                saveMatch(shopOffer, parsedOffer, "classifier", (int)(currentScore  * 100));
+            } else {
+                saveNewOffer(getShopId(), parsedOffer);
+            }
+        }
     }
 
     private String getCategory(String offerTitle) {
