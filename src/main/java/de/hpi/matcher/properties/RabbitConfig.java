@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class RabbitConfig{
+
     @Bean
     public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
         RabbitTemplate rt = new RabbitTemplate(connectionFactory);
@@ -19,4 +20,5 @@ public class RabbitConfig{
     public RabbitAdmin rabbitAdmin(ConnectionFactory connectionFactory) {
         return new RabbitAdmin(connectionFactory);
     }
+
 }

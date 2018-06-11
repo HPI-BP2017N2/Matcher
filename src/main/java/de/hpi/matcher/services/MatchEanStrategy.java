@@ -20,9 +20,10 @@ public class MatchEanStrategy implements MatchIdentifierStrategy {
         if(offer.getEan() == null) return null;
         String normalizedEan = deleteLeadingZeros(offer.getEan());
         ParsedOffer exactMatch = getRepository().getByEan(shopId, normalizedEan);
-        if(exactMatch != null) return exactMatch;
+        return exactMatch;
+        /*if(exactMatch != null) return exactMatch;
 
-        return getRepository().getByEanWithVariation(shopId, deleteLeadingZeros(offer.getEan()));
+        return getRepository().getByEanWithVariation(shopId, deleteLeadingZeros(offer.getEan()));*/
     }
 
     private String deleteLeadingZeros(String ean) {

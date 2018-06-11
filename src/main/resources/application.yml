@@ -1,13 +1,18 @@
 server:
   port: ${MATCHER_PORT}
 
+matcher-settings:
+  labelThreshold: 0.5
+  matchingThreshold: 0.5
+  collectTrainingData: true
+
 spring:
  rabbitmq:
   host: ${RABBIT_IP}
   port: ${RABBIT_PORT}
   username: ${RABBIT_USER}
   password: ${RABBIT_PW}
-  queueName: ${RABBIT_QUEUE_NAME}
+  queueName: "testDoneMessages"
 
 parsed-offers:
  mongodb:
@@ -33,9 +38,19 @@ state:
   password: ${MONGO_MATCHER_PW}
   database: matchingState
 
+models:
+ mongodb:
+  host: ${MONGO_IP}
+  port: ${MONGO_PORT}
+  username: ${MONGO_MATCHER_USER}
+  password: ${MONGO_MATCHER_PW}
+  database: models
+
 cache:
  uri: ${CACHE_IP}
- getOfferRoute: "/getOffer/"
- deleteOfferRoute: "/deleteOffer/"
+ getOfferRoute: "/getOfferAndUpdatePhase/"
+ deleteOfferRoute: "/markAsMatched/"
+ getUnmatchedOfferRoute: "/getUnmatchedOfferAndUpdatePhase/"
+ updatePhaseRoute: "/updatePhase/"
  deleteAllRoute: "/deleteAll/"
  warmupRoute: "/warmup/"

@@ -9,18 +9,14 @@ import org.springframework.stereotype.Component;
 
 @Component
 @EnableConfigurationProperties
-@ConfigurationProperties("cache")
+@ConfigurationProperties("matcher-settings")
 @Getter
 @Setter
 @Primary
-public class CacheProperties {
+public class MatcherProperties {
 
-    private String uri;
-    private String getOfferRoute;
-    private String deleteOfferRoute;
-    private String deleteAllRoute;
-    private String warmupRoute;
-    private String getUnmatchedOfferRoute;
-    private String updatePhaseRoute;
+    private double labelThreshold;
+    private double matchingThreshold;
+    private boolean collectTrainingData;
 
 }

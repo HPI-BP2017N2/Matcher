@@ -22,7 +22,6 @@ import java.net.URI;
 public class Cache {
 
     private final RestTemplate restTemplate;
-
     private final CacheProperties properties;
 
     @Autowired
@@ -34,7 +33,7 @@ public class Cache {
     public void warmup(long shopId) {
         getRestTemplate().getForObject(warmupURI(shopId), Object.class);
     }
-
+    
 
     @Retryable(
             value = {HttpClientErrorException.class },
@@ -44,14 +43,40 @@ public class Cache {
         return getRestTemplate().getForObject(getOffersURI(shopId, phase), ShopOffer.class);
     }
 
+    @Retryable(
+            value = {HttpClientErrorException.class },
+            maxAttempts = 5,
+            backoff = @Backoff(delay = 5000, multiplier = 5))
+    public ShopOffer getUnmatchedOffer(long shopId, byte phase) {
+        return getRestTemplate().getForObject(getUnmatchedOffersURI(shopId, phase), ShopOffer.class);
+    }
+
+    @Retryable(
+            value = {HttpClientErrorException.class },
+            maxAttempts = 5,
+            backoff = @Backoff(delay = 5000))
     public void deleteOffer(long shopId, String offerKey) {
         getRestTemplate().delete(deleteOfferURI(shopId, offerKey));
     }
+
+    @Retryable(
+            value = {HttpClientErrorException.class },
+            maxAttempts = 5,
+            backoff = @Backoff(delay = 5000))
+    public void updatePhase(long shopId, byte oldPhase, byte newPhase) {
+        getRestTemplate().postForLocation(updatePhaseURI(shopId, oldPhase, newPhase), null);
+    }
+
+
 
     public void deleteAll(long shopId) {
         getRestTemplate().delete(deleteAllURI(shopId));
     }
 
+    @Retryable(
+            value = {HttpClientErrorException.class },
+            maxAttempts = 5,
+            backoff = @Backoff(delay = 5000))
     private URI warmupURI(long shopID) {
         return UriComponentsBuilder.fromUriString(getProperties().getUri())
                 .path(getProperties().getWarmupRoute() + shopID)
@@ -63,6 +88,15 @@ public class Cache {
     private URI getOffersURI(long shopID, byte phase) {
         return UriComponentsBuilder.fromUriString(getProperties().getUri())
                 .path(getProperties().getGetOfferRoute() + shopID)
+                .queryParam("phase", phase)
+                .build()
+                .encode()
+                .toUri();
+    }
+
+    private URI getUnmatchedOffersURI(long shopID, byte phase) {
+        return UriComponentsBuilder.fromUriString(getProperties().getUri())
+                .path(getProperties().getGetUnmatchedOfferRoute() + shopID)
                 .queryParam("phase", phase)
                 .build()
                 .encode()
@@ -81,6 +115,16 @@ public class Cache {
     private URI deleteAllURI(long shopID) {
         return UriComponentsBuilder.fromUriString(getProperties().getUri())
                 .path(getProperties().getDeleteAllRoute() + shopID)
+                .build()
+                .encode()
+                .toUri();
+    }
+
+    private URI updatePhaseURI(long shopID, byte oldPhase, byte newPhase) {
+        return UriComponentsBuilder.fromUriString(getProperties().getUri())
+                .path(getProperties().getDeleteAllRoute() + shopID)
+                .queryParam("oldPhase", oldPhase)
+                .queryParam("newPhase", newPhase)
                 .build()
                 .encode()
                 .toUri();
