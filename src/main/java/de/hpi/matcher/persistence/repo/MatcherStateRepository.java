@@ -26,11 +26,11 @@ public class MatcherStateRepository {
     }
 
     public void saveState(long shopId, byte phase, List<Integer> imageIds) {
-        //getMongoTemplate().insert(new State(shopId, phase, imageIds));
+        getMongoTemplate().insert(new State(shopId, phase, imageIds));
     }
 
     public void saveAllStates(List<State> states) {
-        //getMongoTemplate().insertAll(states);
+        getMongoTemplate().insertAll(states);
     }
 
 }
