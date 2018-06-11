@@ -17,6 +17,7 @@ public class MatchingResult {
     private final String matchingReason;
     private final int confidence;
     private final String offerKey;
+    private final String idealoBrand;
     private final String idealoCategory;
     private final String idealoCategoryName;
     private final String higherLevelIdealoCategory;
@@ -33,5 +34,6 @@ public class MatchingResult {
         this.higherLevelIdealoCategory = null;
         this.higherLevelIdealoCategoryName = null;
         this.parsedData = offer;
+        this.idealoBrand = null;
     }
 }

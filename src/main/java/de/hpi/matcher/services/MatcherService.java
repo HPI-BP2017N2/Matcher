@@ -271,6 +271,7 @@ public class MatcherService {
                 matchingReason,
                 confidence,
                 offer.getOfferKey(),
+                offer.getBrandName(),
                 offer.getMappedCatalogCategory(),
                 offer.getCategoryName(),
                 offer.getHigherLevelCategory(),
