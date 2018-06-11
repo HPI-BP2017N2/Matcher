@@ -2,7 +2,7 @@ package de.hpi.matcher.services;
 
 import de.hpi.matcher.dto.ShopOffer;
 import de.hpi.matcher.persistence.ParsedOffer;
-import de.hpi.matcher.persistence.repo.ParsedOfferRepositoryImpl;
+import de.hpi.matcher.persistence.repo.ParsedOfferRepository;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -29,7 +29,7 @@ public class MatchEanStrategyTest {
     private final ShopOffer shopOffer = new ShopOffer();
 
     @Mock
-    private ParsedOfferRepositoryImpl repository;
+    private ParsedOfferRepository repository;
 
     private MatchEanStrategy strategy;
 
@@ -55,13 +55,4 @@ public class MatchEanStrategyTest {
 
     }
 
-    @Test
-    public void matchDirtyEan(){
-        doReturn(null).when(getRepository()).getByEan(getEXAMPLE_SHOP_ID(), getEXAMPLE_EAN());
-        doReturn(getParsedOffer()).when(getRepository()).getByEanWithVariation(getEXAMPLE_SHOP_ID(), getEXAMPLE_EAN());
-
-        assertEquals(getParsedOffer(), getStrategy().match(getEXAMPLE_SHOP_ID(), getShopOffer()));
-        verify(getRepository()).getByEan(getEXAMPLE_SHOP_ID(), getEXAMPLE_EAN());
-        verify(getRepository()).getByEanWithVariation(getEXAMPLE_SHOP_ID(), getEXAMPLE_EAN());
-    }
 }

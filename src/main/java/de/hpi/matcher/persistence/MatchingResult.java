@@ -1,30 +1,37 @@
 package de.hpi.matcher.persistence;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import de.hpi.matcher.dto.ShopOffer;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 @Getter
-@Setter
+@Setter(AccessLevel.PRIVATE)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@RequiredArgsConstructor
 public class MatchingResult {
 
-    private long shopId;
-    private String matchingReason;
-    private int confidence;
-    private String offerKey;
-    private ParsedOffer parsedData;
+    private final long shopId;
+    private final String matchingReason;
+    private final int confidence;
+    private final String offerKey;
+    private final String idealoCategory;
+    private final String idealoCategoryName;
+    private final String higherLevelIdealoCategory;
+    private final String higherLevelIdealoCategoryName;
+    private final ParsedOffer parsedData;
 
-    public MatchingResult(long shopId,
-                          String matchingReason,
-                          int confidence,
-                          String offerKey,
-                          ParsedOffer parsedData) {
-        setShopId(shopId);
-        setMatchingReason(matchingReason);
-        setConfidence(confidence);
-        setOfferKey(offerKey);
-        setParsedData(parsedData);
+    public MatchingResult(long shopId, ParsedOffer offer, int confidence) {
+        this.shopId = shopId;
+        this.matchingReason = null;
+        this.confidence = confidence;
+        this.offerKey = null;
+        this.idealoCategory = null;
+        this.idealoCategoryName = null;
+        this.higherLevelIdealoCategory = null;
+        this.higherLevelIdealoCategoryName = null;
+        this.parsedData = offer;
     }
-
 }

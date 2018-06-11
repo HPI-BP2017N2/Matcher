@@ -1,9 +1,23 @@
 package de.hpi.matcher.persistence.repo;
 
 import de.hpi.matcher.persistence.MatchingResult;
+import lombok.AccessLevel;
+import lombok.Getter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.stereotype.Repository;
 
-public interface MatchingResultRepository {
+@Getter(AccessLevel.PRIVATE)
+@Repository
+public class MatchingResultRepository {
 
-    void save(long shopId, MatchingResult matchingResult);
-    void createCollection(long shopId);
+    @Autowired
+    @Qualifier("matchingResultTemplate")
+    private MongoTemplate mongoTemplate;
+
+
+    public void save(long shopId, MatchingResult matchingResult) {
+        getMongoTemplate().insert(matchingResult, Long.toString(shopId));
+    }
 }

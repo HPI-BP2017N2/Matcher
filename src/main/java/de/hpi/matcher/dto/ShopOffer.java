@@ -13,7 +13,8 @@ import java.util.Map;
 public class ShopOffer {
 
     private String offerKey;
-    private boolean isMatched;
+    private byte phase = 0;
+    private boolean isMatched = false;
     private Long shopId;
     private String brandName;
     private List<String> categoryPaths;
@@ -31,6 +32,9 @@ public class ShopOffer {
     private Map<String, List<String>> imageUrls;
     private String productKey;
     private String mappedCatalogCategory;
-    private byte phase;
+    private String categoryName;
+    private String higherLevelCategory;
+    private String higherLevelCategoryName;
     private String imageId;
+
 }

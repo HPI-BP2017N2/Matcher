@@ -1,5 +1,6 @@
 package de.hpi.matcher.properties;
 
+
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -9,18 +10,15 @@ import org.springframework.stereotype.Component;
 
 @Component
 @EnableConfigurationProperties
-@ConfigurationProperties("cache")
+@ConfigurationProperties("modelgenerator")
 @Getter
 @Setter
 @Primary
-public class CacheProperties {
+public class ModelGeneratorProperties {
 
     private String uri;
-    private String getOfferRoute;
-    private String deleteOfferRoute;
-    private String deleteAllRoute;
-    private String warmupRoute;
-    private String getUnmatchedOfferRoute;
-    private String updatePhaseRoute;
+    private String modelRoute;
+    private String categoryClassifierRoute;
+    private String brandClassifierRoute;
 
 }
