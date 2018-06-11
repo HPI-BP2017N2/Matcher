@@ -205,7 +205,7 @@ public class MatcherService {
         List<ParsedOffer> offersWithEan = getParsedOfferRepository().getOffersWithEan(shopId);
 
         for(ParsedOffer offer : offersWithEan) {
-            saveNewOffer(shopId, offer);
+            saveNewOffer(shopId, offer, 100);
             getParsedOfferRepository().deleteParsedOffer(shopId, offer.getUrl());
         }
     }
@@ -239,7 +239,7 @@ public class MatcherService {
                 ShopOffer shopOffer = shopOffers.get(indices[1]);
                 saveMatch(shopOffer, parsedOffer, "classifier", (int)(currentScore  * 100));
             } else {
-                saveNewOffer(getShopId(), parsedOffer);
+                saveNewOffer(getShopId(), parsedOffer,  0);
             }
         }
     }
@@ -280,8 +280,8 @@ public class MatcherService {
         getMatchingResultRepository().save(offer.getShopId(), result);
     }
 
-    private void saveNewOffer(long shopId, ParsedOffer offer) {
-        getMatchingResultRepository().save(shopId, new MatchingResult(shopId, offer));
+    private void saveNewOffer(long shopId, ParsedOffer offer, int confidence) {
+        getMatchingResultRepository().save(shopId, new MatchingResult(shopId, offer, confidence));
     }
 
     private void deleteShopOfferAndParsedOffer(long shopId, ShopOffer shopOffer, ParsedOffer parsedOffer) {

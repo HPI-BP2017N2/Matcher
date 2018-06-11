@@ -23,10 +23,10 @@ public class MatchingResult {
     private final String higherLevelIdealoCategoryName;
     private final ParsedOffer parsedData;
 
-    public MatchingResult(long shopId, ParsedOffer offer) {
+    public MatchingResult(long shopId, ParsedOffer offer, int confidence) {
         this.shopId = shopId;
         this.matchingReason = null;
-        this.confidence = 100;
+        this.confidence = confidence;
         this.offerKey = null;
         this.idealoCategory = null;
         this.idealoCategoryName = null;
