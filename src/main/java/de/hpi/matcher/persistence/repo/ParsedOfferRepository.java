@@ -33,10 +33,6 @@ public class ParsedOfferRepository {
         return getByIdentifier(shopId, "ean", ean);
     }
 
-    public ParsedOffer getByEanWithVariation(long shopId, String ean) {
-        return(getMongoTemplate().findOne(query(where("ean").regex("^[\\D]*" + ean + "[\\D]*$")), ParsedOffer.class, Long.toString(shopId)));
-    }
-
     public ParsedOffer getByHan(long shopId, String han) {
         return getByIdentifier(shopId, "han", han);
     }
