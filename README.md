@@ -43,3 +43,7 @@ It is written in Java and uses the Spring framework.
 4. Matcher loads classifiers. If there are no classifiers, matcher will save the current shop ID in the state database and abort the matching process.
 5. Matcher classifies match probabilities for every combination of remaining parsed offers and shop offers. Features are equality of SKU, HAN, URL, brand, classified brand,  category and image ID, text similarities for title and description, percentaged deviance of price.
 6. The highest scored matches with a probability above the specified threshold are stored as matches, the remaining shop offers as newly discovered ones.
+
+## Future work
+- do not load models from file system
+- make pre-selection on offers to match with machine learning to decrease comparisons
