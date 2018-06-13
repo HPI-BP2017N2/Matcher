@@ -14,10 +14,10 @@ It is written in Java and uses the Spring framework.
 3. RabbitMQ  
  The matcher consumes commands for starting the matching process from RabbitMQ.
 4. Models  
-  A folder named "models" expected to exist containing the serialized classifiers as .json files.  
-    2.4.1. One file is named model.json. It contains a serialized classifier used for deciding whether a parsed offer and an idealo offer match or not.  
-    2.4.2. One file is named category.json. It contains a serialized neural network for classifying the category of a parsed offer.  
-    2.4.3. One file is named brand.json. It contains a serialized neural network for classifying the brand of a parsed offer.  
+ A folder named "models" expected to exist containing the serialized classifiers as .json files.  
+ 4.1. One file is named model.json. It contains a serialized classifier used for deciding whether a parsed offer and an idealo offer match or not.  
+ 4.2. One file is named category.json. It contains a serialized neural network for classifying the category of a parsed offer.  
+ 4.3. One file is named brand.json. It contains a serialized neural network for classifying the brand of a parsed offer.  
 
 ### Configuration
 #### Environment variables
