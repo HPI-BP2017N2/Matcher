@@ -11,13 +11,14 @@ It is written in Java and uses the Spring framework.
  2.1. One database is used for reading the information extracted by [the parser](https://github.com/HPI-BP2017N2/Parser). It is expected that those information is separated into multiple collections (one for every shop, named by the corresponding shop ID).  
  2.2. One database is used for saving the results of the matching process. Those data can be used for further visualization or processing. [The model generator](https://github.com/HPI-BP2017N2/MachineLearningModelGenerator) can use some of this data for training various classifiers. The collection structure is similar to the parsed offers.  
  2.3. One database is used for storing and reading the state of the matcher. When restarted, the matcher will continue matching the shops stored there.  
-2.4. One database is used for reading the different classifiers used during the matching process. It is expected to have two collections.   
-  2.4.1. One collection is named scoredModel. It contains a serialized classifier used for deciding whether a parsed offer and an idealo offer match or not.  
-  2.4.2. One collection is named serializedParagraphVectors. It contains one serialized neural network each for classifying the brand and the category of a parsed offer.  
-2. RabbitMQ  
+3. RabbitMQ  
  The matcher consumes commands for starting the matching process from RabbitMQ.
- 
- 
+4. Models  
+  A folder named "models" expected to exist containing the serialized classifiers as .json files.  
+    2.4.1. One file is named model.json. It contains a serialized classifier used for deciding whether a parsed offer and an idealo offer match or not.  
+    2.4.2. One file is named category.json. It contains a serialized neural network for classifying the category of a parsed offer.  
+    2.4.3. One file is named brand.json. It contains a serialized neural network for classifying the brand of a parsed offer.  
+
 ### Configuration
 #### Environment variables
 - MONGO_IP: The IP of the MongoDB instance
@@ -39,6 +40,6 @@ It is written in Java and uses the Spring framework.
 1. Matcher gets a message to start matching one specific shop or reads a state from the database.
 2. Matcher tells cache to download the offers idealo knows from this shop.
 3. Matcher requests every idealo offer and searches for a "safe" match (EAN or combination of HAN and brand can be found in parsed offers). Those matches are being stored.
-4. Matcher loads classifiers from database. If there are no classifiers, matcher will save the current shop ID in the state database and abort the matching process.
+4. Matcher loads classifiers. If there are no classifiers, matcher will save the current shop ID in the state database and abort the matching process.
 5. Matcher classifies match probabilities for every combination of remaining parsed offers and shop offers. Features are equality of SKU, HAN, URL, brand, classified brand,  category and image ID, text similarities for title and description, percentaged deviance of price.
 6. The highest scored matches with a probability above the specified threshold are stored as matches, the remaining shop offers as newly discovered ones.

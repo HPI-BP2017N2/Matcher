@@ -11,6 +11,8 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
+
 @Component
 @Slf4j
 @Getter(AccessLevel.PRIVATE)
@@ -27,7 +29,7 @@ public class RabbitReceiver {
      */
     @RabbitListener(queues = "#{@matcherQueue}")
     public void onMessage(FinishedShop request) throws Exception {
-        log.info("Got request to match shop {}", request.getShopId());
+        log.info("Got request to match shop {} on {]", request.getShopId(), new Date());
         if (getProperties().isCollectTrainingData()) {
             log.info("Do nothing since collectTrainingData is set.");
         } else {

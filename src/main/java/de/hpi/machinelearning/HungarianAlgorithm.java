@@ -165,9 +165,6 @@ public class HungarianAlgorithm {
                 if (mask[i][j] == 1) {
                     assignment[i][0] = i;
                     assignment[i][1] = j;
-                } else {
-                    assignment[i][0] = -1;
-                    assignment[i][1] = -1;
                 }
             }
         }

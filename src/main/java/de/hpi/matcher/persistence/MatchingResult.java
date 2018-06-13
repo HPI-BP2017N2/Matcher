@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.Id;
 
 @Getter
 @Setter(AccessLevel.PRIVATE)
@@ -13,6 +14,7 @@ import lombok.Setter;
 @RequiredArgsConstructor
 public class MatchingResult {
 
+    @Id private final String url;
     private final long shopId;
     private final String matchingReason;
     private final int confidence;
@@ -24,16 +26,17 @@ public class MatchingResult {
     private final String higherLevelIdealoCategoryName;
     private final ParsedOffer parsedData;
 
-    public MatchingResult(long shopId, ParsedOffer offer, int confidence) {
+    public MatchingResult(long shopId, ParsedOffer offer, int confidence, String idealoBrand, String idealoCategory) {
+        this.url = offer.getUrl();
         this.shopId = shopId;
         this.matchingReason = null;
         this.confidence = confidence;
         this.offerKey = null;
         this.idealoCategory = null;
         this.idealoCategoryName = null;
-        this.higherLevelIdealoCategory = null;
+        this.higherLevelIdealoCategory = idealoCategory;
         this.higherLevelIdealoCategoryName = null;
         this.parsedData = offer;
-        this.idealoBrand = null;
+        this.idealoBrand = idealoBrand;
     }
 }

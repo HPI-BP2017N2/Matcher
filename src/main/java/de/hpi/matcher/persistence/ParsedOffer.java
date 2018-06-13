@@ -15,9 +15,10 @@ import java.util.Date;
 public class ParsedOffer {
 
     @Id private String url;
-    private Date crawlingTimestamp;
     @Indexed private String ean;
     @Indexed private String han;
+    private Date crawlingTimestamp;
+    private long shopID;
     private String imageUrl;
     private String sku;
     private String title;

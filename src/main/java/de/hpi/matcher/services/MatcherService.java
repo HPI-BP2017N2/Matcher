@@ -28,6 +28,7 @@ import java.util.*;
 public class MatcherService {
 
     public static final String MAX = "max";
+    public static final String CLASSIFIER = "classifier";
     private final Cache cache;
     private final MatcherStateRepository matcherStateRepository;
     private final ParsedOfferRepository parsedOfferRepository;
@@ -93,17 +94,19 @@ public class MatcherService {
             return;
         }
 
-        log.info("(Re-)Start matching shop {} in phase {} at {}", shopId, phase, new Date());
+        if(phase == (byte) 0) {
+            getCache().warmup(shopId);
+        }
+        log.info("(Re-)Start matching shop {} in phase {} on {}", shopId, phase, new Date());
 
         setupState(shopId, phase);
-        getCache().warmup(shopId);
         setStrategies(shopId);
         setImageIds(shopId);
 
         if(!getIdentifierStrategies().isEmpty() && phase == (byte) 0){
-            log.info("Start matching unique identifiers for shop {} at {}", shopId, new Date());
+            log.info("Start matching unique identifiers for shop {} on {}", shopId, new Date());
             matchAllByIdentifier(shopId);
-            log.info("Finished matching unique identifiers for shop {} at {}", shopId, new Date());
+            log.info("Finished matching unique identifiers for shop {} on {}", shopId, new Date());
         }
 
         setPhase((byte)(getPhase() + 1));
@@ -116,12 +119,15 @@ public class MatcherService {
 
         getClassifier().loadModels();
 
-        log.info("Start matching offers with classifier for shop {} at {}", shopId, new Date());
+        log.info("Start matching offers with classifier for shop {} on {}", shopId, new Date());
         matchRemaining(shopId);
-        log.info("Finished matching offers with classifier for shop {} at {}", shopId, new Date());
+        log.info("Finished matching offers with classifier for shop {} on {}", shopId, new Date());
 
+        if(!getProperties().isCollectTrainingData()) {
+            getCache().deleteAll(getShopId());
+        }
         clearState();
-        log.info("Finished matching shop {} at {}", shopId, new Date());
+        log.info("Finished matching shop {} on {}", shopId, new Date());
     }
 
     private void matchShop(long shopId, byte phase, List<Integer> imageIds) throws Exception {
@@ -179,10 +185,12 @@ public class MatcherService {
             }
         } while (offer != null);
 
+        if(shopOffers.size() == 0) {
+            getMatcherStateRepository().saveState(shopId, (byte)1, getPictureIds());
+            return;
+        }
+
         List<ParsedOffer> parsedOffers = getParsedOfferRepository().getAllOffers(shopId);
-
-
-
         double[][] matchScores = generateScoreMatrix(shopOffers, parsedOffers);
         findAndSaveBestMatches(matchScores, shopOffers, parsedOffers);
     }
@@ -205,7 +213,7 @@ public class MatcherService {
         List<ParsedOffer> offersWithEan = getParsedOfferRepository().getOffersWithEan(shopId);
 
         for(ParsedOffer offer : offersWithEan) {
-            saveNewOffer(shopId, offer, 100);
+            saveNewOffer(shopId, offer, 100, null, null);
             getParsedOfferRepository().deleteParsedOffer(shopId, offer.getUrl());
         }
     }
@@ -218,7 +226,8 @@ public class MatcherService {
             parsedOffer.setCategory(getCategory(parsedOffer.getTitle()));
 
             for(int j = 0; j < shopOffers.size(); j++) {
-                double probability = getClassifier().getMatchProbability(shopOffers.get(j), parsedOffer, getBrand(parsedOffer.getTitle()));
+                ShopOffer shopOffer = shopOffers.get(j);
+                double probability = getClassifier().getMatchProbability(shopOffer, parsedOffer, getBrand(parsedOffer.getTitle()));
                 if(probability < getProperties().getMatchingThreshold()) {
                     probability = 0.0;
                 }
@@ -231,15 +240,32 @@ public class MatcherService {
 
     private void findAndSaveBestMatches(double[][] matchScores, List<ShopOffer> shopOffers, List<ParsedOffer> parsedOffers) {
         int[][] matchIndices = HungarianAlgorithm.hgAlgorithm(matchScores, MAX);
+        Set<ParsedOffer> matchedOffers = new HashSet<>();
 
         for(int[] indices : matchIndices) {
-            double currentScore = matchScores[indices[0]][indices[1]];
-            ParsedOffer parsedOffer = parsedOffers.get(indices[0]);
-            if(currentScore != 0) {
-                ShopOffer shopOffer = shopOffers.get(indices[1]);
-                saveMatch(shopOffer, parsedOffer, "classifier", (int)(currentScore  * 100));
-            } else {
-                saveNewOffer(getShopId(), parsedOffer,  0);
+            int parsedOfferIndex = indices[0];
+            int shopOfferIndex = indices[1];
+
+            double currentScore = matchScores[parsedOfferIndex][shopOfferIndex];
+            ParsedOffer parsedOffer = parsedOffers.get(parsedOfferIndex);
+            if(currentScore != 0 && !matchedOffers.contains(parsedOffer)) {
+                matchedOffers.add(parsedOffer);
+                ShopOffer shopOffer = shopOffers.get(shopOfferIndex);
+                saveMatch(shopOffer, parsedOffer, CLASSIFIER, (int)(currentScore  * 100));
+
+                if(!getProperties().isCollectTrainingData()) {
+                    getParsedOfferRepository().deleteParsedOffer(parsedOffer.getShopID(), parsedOffer.getUrl());
+                    getCache().deleteOffer(getShopId(), shopOffer.getOfferKey());
+                }
+            }
+        }
+
+        parsedOffers.removeAll(matchedOffers);
+
+        for(ParsedOffer parsedOffer : parsedOffers) {
+            saveNewOffer(getShopId(), parsedOffer,  0,null, parsedOffer.getCategory());
+            if(!getProperties().isCollectTrainingData()) {
+                getParsedOfferRepository().deleteParsedOffer(parsedOffer.getShopID(), parsedOffer.getUrl());
             }
         }
     }
@@ -247,6 +273,7 @@ public class MatcherService {
     private String getCategory(String offerTitle) {
         if(offerTitle != null) {
             Pair<String, Double> pair = getClassifier().getCategory(offerTitle);
+            if(pair == null) return null;
             return pair.getRight() < getProperties().getLabelThreshold() ? null : pair.getLeft();
         }
 
@@ -256,6 +283,7 @@ public class MatcherService {
     private String getBrand(String offerTitle) {
         if(offerTitle != null) {
             Pair<String, Double> pair = getClassifier().getBrand(offerTitle);
+            if(pair == null) return null;
             return pair.getRight() < getProperties().getLabelThreshold() ? null : pair.getLeft();
         }
 
@@ -267,6 +295,7 @@ public class MatcherService {
                            String matchingReason,
                            int confidence) {
         MatchingResult result = new MatchingResult(
+                match.getUrl(),
                 offer.getShopId(),
                 matchingReason,
                 confidence,
@@ -281,8 +310,8 @@ public class MatcherService {
         getMatchingResultRepository().save(offer.getShopId(), result);
     }
 
-    private void saveNewOffer(long shopId, ParsedOffer offer, int confidence) {
-        getMatchingResultRepository().save(shopId, new MatchingResult(shopId, offer, confidence));
+    private void saveNewOffer(long shopId, ParsedOffer offer, int confidence, String brand, String category) {
+        getMatchingResultRepository().save(shopId, new MatchingResult(shopId, offer, confidence, brand, category));
     }
 
     private void deleteShopOfferAndParsedOffer(long shopId, ShopOffer shopOffer, ParsedOffer parsedOffer) {

@@ -6,6 +6,7 @@ import de.hpi.machinelearning.persistence.FeatureInstance;
 import de.hpi.machinelearning.persistence.ScoredModel;
 import de.hpi.matcher.dto.ShopOffer;
 import de.hpi.matcher.persistence.ParsedOffer;
+import de.hpi.matcher.persistence.repo.ModelMongoRepository;
 import de.hpi.matcher.persistence.repo.ModelRepository;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -71,6 +72,10 @@ class ProbabilityClassifier {
     }
 
     double getMatchProbability(ShopOffer shopOffer, ParsedOffer parsedOffer, String classifiedBrand) {
+        if(shopOffer == null || parsedOffer == null) {
+            return 0.0;
+        }
+
         FeatureInstance instance = new FeatureInstance(shopOffer, parsedOffer, classifiedBrand);
         try {
             // first value of double[] is match probability, second not-match probability

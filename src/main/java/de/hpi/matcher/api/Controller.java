@@ -32,9 +32,24 @@ public class Controller {
             @ApiResponse(code = 200, message = "Successfully matched shop."),
             @ApiResponse(code = 403, message = "REST interface was disabled for matching from queue.")})
     @RequestMapping(value = "/matchUnique/{shopId}", method = RequestMethod.POST)
-    public ResponseEntity<Object> generateCategoryClassifier(@PathVariable long shopId) throws Exception {
+    public ResponseEntity<Object> matchUnique(@PathVariable long shopId) throws Exception {
         if(getProperties().isCollectTrainingData()) {
             getService().matchShop(shopId, (byte) 0);
+            return new SuccessResponse().send();
+        }
+
+        return new ErrorResponse().send();
+
+    }
+
+    @ApiOperation(value = "Match parsed offers of shop with Machine Learning", response = String.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully matched shop."),
+            @ApiResponse(code = 403, message = "REST interface was disabled for matching from queue.")})
+    @RequestMapping(value = "/matchNonUnique/{shopId}", method = RequestMethod.POST)
+    public ResponseEntity<Object> matchNonUnique(@PathVariable long shopId) throws Exception {
+        if(getProperties().isCollectTrainingData()) {
+            getService().matchShop(shopId, (byte) 1);
             return new SuccessResponse().send();
         }
 

@@ -49,12 +49,34 @@ public class ControllerTest {
     }
 
     @Test
-    public void doNotMatchWhenFlagSet() throws Exception {
+    public void doNotMatchUniqueWhenFlagSet() throws Exception {
         doNothing().when(getService()).matchShop(getSHOP_ID(), (byte)0);
         doReturn(false).when(getProperties()).isCollectTrainingData();
 
         getMockMvc()
                 .perform(post("/matchUnique/" + SHOP_ID))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void matchNonUnique() throws Exception {
+        doNothing().when(getService()).matchShop(getSHOP_ID(), (byte)0);
+        doReturn(true).when(getProperties()).isCollectTrainingData();
+
+        getMockMvc()
+                .perform(post("/matchNonUnique/" + SHOP_ID))
+                .andExpect(status().isOk());
+
+        verify(getService()).matchShop(getSHOP_ID(), (byte)1);
+    }
+
+    @Test
+    public void doNotMatchNonUniqueWhenFlagSet() throws Exception {
+        doNothing().when(getService()).matchShop(getSHOP_ID(), (byte)1);
+        doReturn(false).when(getProperties()).isCollectTrainingData();
+
+        getMockMvc()
+                .perform(post("/matchNonUnique/" + SHOP_ID))
                 .andExpect(status().isForbidden());
     }
 }
