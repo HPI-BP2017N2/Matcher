@@ -151,6 +151,10 @@ public class MatcherService {
         if(getParsedOfferRepository().hanFound(shopId)) {
             getIdentifierStrategies().add(new MatchHanStrategy(getParsedOfferRepository()));
         }
+
+        if(getParsedOfferRepository().skuFound(shopId)) {
+            getIdentifierStrategies().add(new MatchSkuStrategy(getParsedOfferRepository()));
+        }
     }
 
     private void clearState() {

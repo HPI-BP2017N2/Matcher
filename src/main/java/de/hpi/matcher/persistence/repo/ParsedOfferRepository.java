@@ -29,12 +29,20 @@ public class ParsedOfferRepository {
         return getMongoTemplate().count(query(where("han").regex(".+")), ParsedOffer.class, Long.toString(shopId)) > 0;
     }
 
+    public boolean skuFound(long shopId) {
+        return getMongoTemplate().count(query(where("sku").regex(".+")), ParsedOffer.class, Long.toString(shopId)) > 0;
+    }
+
     public ParsedOffer getByEan(long shopId, String ean) {
         return getByIdentifier(shopId, "ean", ean);
     }
 
     public ParsedOffer getByHan(long shopId, String han) {
         return getByIdentifier(shopId, "han", han);
+    }
+
+    public ParsedOffer getBySku(long shopId, String sku) {
+        return getByIdentifier(shopId, "sku", sku);
     }
 
     public void deleteParsedOffer(long shopId, String url) {
@@ -50,7 +58,7 @@ public class ParsedOfferRepository {
     }
 
     public List<ParsedOffer> getOffersWithEan(long shopId) {
-        return getMongoTemplate().find(query(where("ean").ne("").and("ean").ne(null)), ParsedOffer.class, Long.toString(shopId));
+        return getMongoTemplate().find(query(where("ean").nin("", null)), ParsedOffer.class, Long.toString(shopId));
     }
 
     private ParsedOffer getByIdentifier(long shopId, String identifier, String value) {
@@ -62,4 +70,5 @@ public class ParsedOfferRepository {
     public boolean collectionIsEmpty(long shopId) {
         return  getMongoTemplate().count(query(where("_id").exists(true)), ParsedOffer.class, Long.toString(shopId)) == 0;
     }
+
 }
