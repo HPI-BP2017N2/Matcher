@@ -3,6 +3,7 @@ package de.hpi.matcher.persistence.repo;
 import de.hpi.matcher.persistence.State;
 import lombok.AccessLevel;
 import lombok.Getter;
+import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -26,10 +27,14 @@ public class MatcherStateRepository {
     }
 
     public void saveState(long shopId, byte phase, List<Integer> imageIds) {
+        getMongoTemplate().getCollection("state").deleteOne(new Document("_id", shopId));
         getMongoTemplate().insert(new State(shopId, phase, imageIds));
     }
 
     public void saveAllStates(List<State> states) {
+        for (State state : states) {
+            getMongoTemplate().getCollection("state").deleteOne(new Document("_id", state.getShopId()));
+        }
         getMongoTemplate().insertAll(states);
     }
 

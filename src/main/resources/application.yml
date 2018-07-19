@@ -28,7 +28,7 @@ matching-results:
   port: ${MONGO_PORT}
   username: ${MONGO_MATCHER_USER}
   password: ${MONGO_MATCHER_PW}
-  database: matchingResults
+  database: matchingResultsEval
 
 state:
  mongodb:

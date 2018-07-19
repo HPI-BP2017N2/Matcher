@@ -17,10 +17,10 @@ import static de.hpi.machinelearning.TextSimilarityCalculator.jaccardSimilarity;
 public class FeatureInstance extends DenseInstance {
 
     public FeatureInstance(@NotNull ShopOffer shopOffer, @NotNull ParsedOffer parsedOffer, String classifiedBrand) {
-        super(13);
+        super(11);
         final ArrayList<Attribute> features = new AttributeVector();
         Instances dataSet = new Instances("Rel", features, 1);
-        dataSet.setClassIndex(12);
+        dataSet.setClassIndex(10);
         this.setDataset(dataSet);
         this.setValue(features.get(0), jaccardSimilarity(getMapValue(shopOffer.getTitles()), parsedOffer.getTitle()));
         this.setValue(features.get(1), cosineSimilarity(getMapValue(shopOffer.getTitles()), parsedOffer.getTitle()));
@@ -32,8 +32,6 @@ public class FeatureInstance extends DenseInstance {
         this.setValue(features.get(7), getEquation(shopOffer.getBrandName(), classifiedBrand));
         this.setValue(features.get(8), getEquation(shopOffer.getMappedCatalogCategory(), parsedOffer.getCategory()));
         this.setValue(features.get(9), compareImageIds(shopOffer.getImageId(), parsedOffer.getImageUrl()));
-        this.setValue(features.get(10), getEquation(shopOffer.getHan(), parsedOffer.getHan()));
-        this.setValue(features.get(11), getEquation(shopOffer.getSku(), parsedOffer.getSku()));
     }
 
     private <T> T getMapValue(Map<String, T> map) {

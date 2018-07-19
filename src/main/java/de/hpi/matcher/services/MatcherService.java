@@ -94,7 +94,7 @@ public class MatcherService {
             return;
         }
 
-        if(phase == (byte) 0) {
+        if(phase == (byte) 0 || phase == (byte) 1) {
             getCache().warmup(shopId);
         }
         log.info("(Re-)Start matching shop {} in phase {} on {}", shopId, phase, new Date());
@@ -204,7 +204,12 @@ public class MatcherService {
             ParsedOffer match = (offer != null) ? strategy.match(shopId, offer) : null;
             if(match != null) {
                 if (match.getImageUrl()!= null) {
-                    match.setImageId(PictureIdFinder.getImageId(match.getImageUrl(), getPictureIds()));
+                    try {
+                        match.setImageId(PictureIdFinder.getImageId(match.getImageUrl(), getPictureIds()));
+
+                    } catch (IllegalArgumentException e) {
+                        log.info("Could not set image ID for offer {}", match.getUrl());
+                    }
                 }
                 saveMatch(offer, match, strategy.getMatchingReason(), 100);
                 deleteShopOfferAndParsedOffer(shopId, offer, match);
@@ -310,7 +315,6 @@ public class MatcherService {
                 offer.getHigherLevelCategory(),
                 offer.getHigherLevelCategoryName(),
                 match);
-
         getMatchingResultRepository().save(offer.getShopId(), result);
     }
 
